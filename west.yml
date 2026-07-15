@@ -1,0 +1,23 @@
+# Copyright (c) 2026 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+#
+# West manifest for the ncs-matter-zigbee extension.
+# This project extends ncs-zigbee with combined Matter + Zigbee support.
+
+manifest:
+  remotes:
+    - name: ncs
+      url-base: https://github.com/nrfconnect
+
+  projects:
+    - name: nrf
+      remote: ncs
+      repo-path: sdk-nrf
+      revision: v3.4.0
+      import: true
+
+    - name: ncs-zigbee
+      remote: ncs
+      repo-path: ncs-zigbee
+      revision: main
+      path: ncs-zigbee
