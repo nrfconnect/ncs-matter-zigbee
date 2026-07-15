@@ -1,0 +1,16 @@
+# editors
+.vscode
+*.swp
+*~
+
+# python
+.venv
+__pycache__/
+
+# build
+/build*
+/samples/**/build*
+/twister-out*
+
+# docs
+/docs/_build*
