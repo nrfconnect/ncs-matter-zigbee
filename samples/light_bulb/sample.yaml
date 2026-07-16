@@ -1,0 +1,20 @@
+sample:
+  description: Combined Matter + Zigbee dimmable light bulb sample
+  name: Matter + Zigbee Light bulb
+common:
+  tags:
+    - ci_build
+    - smoke
+    - sysbuild
+    - ci_samples_matter_zigbee
+tests:
+  sample.matter_zigbee.light_bulb:
+    sysbuild: true
+    build_only: true
+    integration_platforms:
+      - nrf54l15dk/nrf54l15/cpuapp
+      - nrf54lm20dk/nrf54lm20b/cpuapp
+    platform_allow:
+      - nrf54l15dk/nrf54l15/cpuapp
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+      - nrf54lm20dk/nrf54lm20b/cpuapp
