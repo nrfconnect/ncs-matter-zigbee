@@ -3,4 +3,9 @@
 #
 # CMake entry point for the ncs-matter-zigbee add-on module.
 
-# empty for now
+if(CONFIG_MATTER_ZIGBEE_ADD_ON)
+	zephyr_include_directories(include)
+
+	add_subdirectory(subsys)
+endif()
+

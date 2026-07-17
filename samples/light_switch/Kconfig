@@ -1,0 +1,64 @@
+#
+# Copyright (c) 2024-2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+if OPENTHREAD
+
+choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
+	default OPENTHREAD_NORDIC_LIBRARY_MTD
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_MTD
+endchoice
+
+config CHIP_ENABLE_ICD_SUPPORT
+	default y
+
+endif # OPENTHREAD
+
+if ZIGBEE_BT_DFU
+
+config BT_DEVICE_NAME
+	default "Zigbee_Switch"
+
+endif # ZIGBEE_BT_DFU
+
+config MPSL_THREAD_COOP_PRIO
+	default 8
+
+source "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/nrfconnect/chip-module/Kconfig.features"
+source "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/nrfconnect/chip-module/Kconfig.defaults"
+source "$(ZEPHYR_NRF_MODULE_DIR)/samples/matter/common/src/Kconfig"
+
+menu "Zephyr Kernel"
+source "Kconfig.zephyr"
+endmenu
+
+module = NUS_CMD
+module-str = NUS command
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+
+config LIGHT_SWITCH_CONFIGURE_TX_POWER
+	bool "Configure TX power"
+	default y
+	help
+		Enable this option to configure TX power for the sample.
+
+config LIGHT_SWITCH_TX_POWER
+	int "TX power"
+	depends on LIGHT_SWITCH_CONFIGURE_TX_POWER
+	default 0
+	help
+		TX power level in dBm.
+
+config LIGHT_SWITCH_LOW_POWER
+	bool "Low power mode"
+	default y
+	depends on PM_DEVICE
+	help
+		Enable low power mode for the Light Switch sample.
+		This enables sleepy behavior and disables LEDs for power savings.

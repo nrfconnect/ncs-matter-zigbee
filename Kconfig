@@ -5,6 +5,14 @@
 
 menuconfig MATTER_ZIGBEE_ADD_ON
 	bool "Enable Matter + Zigbee add-on"
+	depends on ZIGBEE_ADD_ON && CHIP
 	default y
 	help
 	  Add-on module for combined Matter and Zigbee solutions.
+	  Requires both the ncs-zigbee (ZIGBEE_ADD_ON) and Matter (CHIP).
+
+if MATTER_ZIGBEE_ADD_ON
+
+rsource "subsys/Kconfig"
+
+endif
