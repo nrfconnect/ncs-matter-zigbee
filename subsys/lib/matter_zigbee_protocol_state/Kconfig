@@ -1,0 +1,45 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig MATTER_ZIGBEE_PROTOCOL_STATE
+	bool "Persistent protocol state for combined Matter + Zigbee applications"
+	depends on MATTER_ZIGBEE_COEXISTENCE && SETTINGS
+	default y
+	help
+	  Small settings-backed module that tracks which protocol (Zigbee or
+	  Matter) the combined application should resume after a reboot. Used
+	  by samples that host both stacks on the same 802.15.4 radio.
+
+if MATTER_ZIGBEE_PROTOCOL_STATE
+
+choice MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL
+	prompt "Default protocol on first boot"
+	default MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_ZIGBEE
+	help
+	  Applied when no protocol state has been stored yet (factory-fresh
+	  device), after a Matter factory reset, or after the settings entry
+	  was erased. Subsequent boots use the persisted value until one of
+	  those events applies the default again.
+
+config MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_ZIGBEE
+	bool "Zigbee"
+	help
+	  Start on Zigbee: bring up the Zigbee stack and hand the 802.15.4
+	  radio to ZBOSS unless a previous run already persisted Matter.
+
+config MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_MATTER
+	bool "Matter"
+	help
+	  Start on Matter: skip Zigbee stack start and hand the 802.15.4 radio
+	  to OpenThread unless a previous run already persisted Zigbee.
+
+endchoice
+
+module = MATTER_ZIGBEE_PROTOCOL_STATE
+module-str = Matter/Zigbee protocol state
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # MATTER_ZIGBEE_PROTOCOL_STATE
