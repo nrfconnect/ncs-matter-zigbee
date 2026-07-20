@@ -12,3 +12,10 @@
 .. |config| replace:: See `Configuring and building`_ in the |NCS| documentation for information about how to permanently or temporarily change the configuration.
 .. |kconfig_search| replace::
    For details about the Kconfig options mentioned here, see the `Kconfig search`_ in the |NCS| documentation.
+
+.. ### Other shortcuts
+
+.. |sysbuild_autoenabled_ncs| replace:: When building `repository applications <Repository application_>`_ in the |addon| which is an `SDK repository <Repository types_>`_, building with sysbuild is `enabled by default <Sysbuild enabled by default_>`_.
+   If you work with out-of-tree `freestanding applications <Freestanding application_>`_, you need to manually pass the ``--sysbuild`` parameter to every build command or `configure west to always use it <Configuring sysbuild usage in west_>`_.
+
+.. |enable_zigbee_before_testing| replace:: Make sure the `Zigbee R23 add-on`_ is included in your workspace and configured before building and testing this sample.
