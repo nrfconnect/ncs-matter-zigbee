@@ -7,6 +7,8 @@ Platform design
    :local:
    :depth: 2
 
+This page describes the platform designs that are possible to run the combined Matter and Zigbee solution on Nordic Semiconductor devices.
+
 .. _matter_zigbee_platform_design:
 
 Single-chip, combined Matter + Zigbee (SoC)
@@ -43,7 +45,7 @@ The 802.15.4 radio is handed over to OpenThread once Matter commissioning comple
 
    Combined Matter + Zigbee architecture on a single SoC
 
-This platform design is currently provided as a proof of concept and is supported on the following development kits:
+This platform design is supported on the following development kits:
 
 * nRF54L15 DK (``nrf54l15dk/nrf54l15/cpuapp``)
 * nRF54LM20 DK (``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp``)

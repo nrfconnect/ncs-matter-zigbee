@@ -7,7 +7,7 @@ Memory requirements
    :local:
    :depth: 2
 
-This page provides information about the amount of flash memory and RAM that is required by the :ref:`matter_zigbee_samples`, as well as stack memory requirements for ``main`` and ``zboss`` threads.
+This page provides information about the amount of flash memory and RAM that is required by the :ref:`matter_zigbee_samples`.
 Use it to check if your application has enough space for a given configuration.
 
 Unless stated otherwise, the default :file:`prj.conf` was used for debug builds, and :file:`matter_fota_release.conf` was added as an extra overlay for release builds.
@@ -21,6 +21,7 @@ Use them as-is, or copy and adjust them for your board.
 
 Each layout reserves the end of internal flash for:
 
+* ``factory_data_partition`` - Matter factory data
 * ``storage_partition`` - Zephyr settings storage
 * ``zboss_nvram`` - ZBOSS non-volatile data
 * ``zboss-product-config`` - ZBOSS product configuration
@@ -37,9 +38,8 @@ The following table lists the available files, which targets they cover, and whe
 
    * - Internal flash
      - :file:`dts/<board>_partitions.dtsi`
-     - | nRF54L15 DK (DK only)
-       | nRF54LM20 DK (DK only)
-     - Default layout with ``boot_partition``, ``slot1_partition``, and ``factory_data_partition`` on internal flash.
+     - | nRF54LM20 DK (DK only)
+     - Default layout with all partitions on internal flash.
 
    * - External flash (MCUboot secondary slot)
      - :file:`dts/<board>_partitions_ext_flash.dtsi`

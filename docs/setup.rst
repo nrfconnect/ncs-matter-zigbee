@@ -1,4 +1,4 @@
-.. _ncs_matter_setup:
+.. _matter_zigbee_setup:
 
 Requirements and setup
 ######################

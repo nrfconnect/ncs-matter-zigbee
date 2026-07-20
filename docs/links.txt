@@ -27,6 +27,7 @@
 
 .. _`Matter and Zigbee Add-on`: https://github.com/nrfconnect/ncs-matter-zigbee
 .. _`Zigbee R23 add-on`: https://github.com/nrfconnect/ncs-zigbee
+.. _`Zigbee Network Coordinator`: https://nrfconnectdocs.nordicsemi.com/addons/zigbee-r23/latest/samples/network_coordinator/README.html
 
 .. ### nrfxlib documentation set
 
@@ -39,6 +40,7 @@
 
 .. ### Matter documentation
 
+.. _`Matter`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/nrf/protocols/matter/index.html
 .. _`CHIP Tool`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/matter/chip_tool_guide.html
 .. _`mcumgr`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/zephyr/services/device_mgmt/mcumgr.html
 .. _`Simple Management Protocol`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/zephyr/services/device_mgmt/smp_protocol.html
