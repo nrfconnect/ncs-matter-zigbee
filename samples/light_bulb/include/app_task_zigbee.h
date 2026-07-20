@@ -32,11 +32,10 @@ void zb_button_handler(uint32_t button_state, uint32_t has_changed);
  * @brief Register the Zigbee button handler with the DK library.
  *
  * Must be called after Matter's Board::Init() (which runs dk_buttons_init())
-#endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
  * so that dk_button_handler_add() finds an initialised subsystem.
  */
-#endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 void zb_register_button_handler(void);
+#endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 
 #ifdef __cplusplus
 }

@@ -5,7 +5,7 @@
  */
 
 #include <matter_zigbee_protocol_state.h>
-#include <zigbee/zigbee_settings_subsys.h>
+#include <matter_zigbee_settings_subsys.h>
 
 #include <stdint.h>
 
@@ -32,7 +32,7 @@ static int protocol_state_load_direct_cb(const char *key, size_t len,
 
 	ARG_UNUSED(param);
 
-	if (!settings_name_steq(key, ZIGBEE_SETTINGS_KEY_MATTER_PROTOCOL_STATE, &next) || next) {
+	if (!settings_name_steq(key, MATTER_ZIGBEE_SETTINGS_KEY_PROTOCOL_STATE, &next) || next) {
 		return 0;
 	}
 
@@ -127,7 +127,7 @@ void protocol_state_set(active_protocol_t protocol)
 	}
 
 	uint8_t value = (uint8_t)protocol;
-	int rc = settings_save_one(ZIGBEE_SETTINGS_FULL_NAME_MATTER_PROTOCOL_STATE, &value, sizeof(value));
+	int rc = settings_save_one(MATTER_ZIGBEE_SETTINGS_FULL_NAME_PROTOCOL_STATE, &value, sizeof(value));
 
 	if (rc) {
 		LOG_ERR("Failed to persist protocol state: %d", rc);
