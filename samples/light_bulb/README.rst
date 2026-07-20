@@ -1,7 +1,7 @@
 .. _matter_zigbee_light_bulb_sample:
 
-Matter + Zigbee: Light bulb
-###########################
+Matter and Zigbee: Light bulb
+#############################
 
 .. contents::
    :local:
@@ -14,21 +14,20 @@ You can use this sample with the Network coordinator and Light switch samples fr
 
 The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio between the ZBOSS stack and OpenThread.
 For Thread networking in Matter mode, the light bulb acts as an OpenThread Full Thread Device (FTD).
-It is supported on the ``nrf54l15dk/nrf54l15/cpuapp``, ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
 Requirements
 ************
 
 The sample supports the following development kits:
 
-.. include:: /includes/sample_board_rows.txt
+.. table-from-sample-yaml::
 
-To test this sample, you also need to program the following samples from the `Zigbee R23 add-on`_:
+To test this sample, you also need to program the following samples:
 
-* The Network coordinator sample on one separate device.
-* The Zigbee-only Light switch sample on one or more separate devices.
+* The `Zigbee Network Coordinator`_ sample from the `Zigbee R23 add-on`_ on one separate device.
+* The :ref:`matter_zigbee_light_switch_sample` sample on one or more separate devices.
 
-Alternatively, use the :ref:`matter_zigbee_light_switch_sample` on a separate device and commission the two devices over Touchlink without a Zigbee Coordinator.
+Alternatively, if both light bulb and light switch devices support Touchlink, you can use it for Zigbee commissioning without a Zigbee Coordinator.
 
 Overview
 ********

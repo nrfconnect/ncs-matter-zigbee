@@ -12,19 +12,25 @@ All samples are placed in the :file:`samples` directory in the |addon| repositor
 
    * - Sample
      - Zigbee role
-     - Matter role
-     - Touchlink
+     - Zigbee device type
+     - Matter device type
+     - Thread role
+     - Zigbee Touchlink
    * - :ref:`matter_zigbee_light_switch_sample`
-     - End Device (Dimmer Switch)
-     - Dimmer Switch (binding client)
+     - Zigbee End Device
+     - Zigbee Dimmer Switch
+     - Matter Dimmer Switch
+     - Sleepy End Device
      - Initiator (optional)
    * - :ref:`matter_zigbee_light_bulb_sample`
-     - Router (Dimmable Light)
-     - Dimmable Light
+     - Zigbee Router
+     - Zigbee Dimmable Light
+     - Matter Dimmable Light
+     - Full Thread Device
      - Target (optional)
 
-Both samples share the same runtime model: the ZBOSS stack and OpenThread (used by Matter) time-share the 802.15.4 radio, with ownership handed over at commissioning time by the :file:`matter_zigbee_coexistence` library.
-See :ref:`matter_zigbee_platform_design` for the platform overview and :ref:`matter_zigbee_light_switch_sample` for a detailed description of protocol selection, factory reset, and onboarding data generation.
+The samples share the same runtime model: the ZBOSS stack and OpenThread (used by Matter) time-share the 802.15.4 radio, with ownership handed over at commissioning time by the :file:`matter_zigbee_coexistence` library.
+See :ref:`matter_zigbee_architectures` for the platform overview.
 
 .. toctree::
    :maxdepth: 1

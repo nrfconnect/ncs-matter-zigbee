@@ -1,4 +1,4 @@
-As a proof of concept, the combined Matter and Zigbee application has the following limitations:
+The combined Matter and Zigbee application has the following limitations:
 
 * The 802.15.4 radio is time-shared, never concurrent: once the device runs on Matter, Zigbee is torn down until the active protocol changes again.
   To switch back to Zigbee, ensure the ``CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH`` Kconfig option is enabled, then long-press the button.
