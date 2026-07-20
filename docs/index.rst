@@ -22,3 +22,5 @@ See :ref:`matter_zigbee_architectures` for the architecture overview and :ref:`m
    memory
    config
    samples/index
+   release_notes
+   known_issues
