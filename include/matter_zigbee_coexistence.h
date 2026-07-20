@@ -55,7 +55,6 @@ struct matter_zigbee_coexistence_callbacks {
 	 *  May be NULL.
 	 */
 	void (*post_matter_board_init)(void);
-
 };
 
 /** @brief Start the coexistence runtime.
@@ -121,7 +120,6 @@ void matter_zigbee_coexistence_pre_server_init(void);
  */
 bool matter_zigbee_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
 						     uint32_t switch_button);
-
 
 /** @brief Forward selected ZBOSS application signals to the coexistence runtime.
  *

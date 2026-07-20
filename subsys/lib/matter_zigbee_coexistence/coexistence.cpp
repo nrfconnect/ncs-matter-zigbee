@@ -152,13 +152,11 @@ void matter_thread_fn()
 }
 
 /* Create threads as dormant, they are started later. */
-K_THREAD_DEFINE(zigbee_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD_STACK_SIZE,
-		zigbee_thread_fn, NULL, NULL, NULL,
-		CONFIG_MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
+K_THREAD_DEFINE(zigbee_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD_STACK_SIZE, zigbee_thread_fn, NULL,
+		NULL, NULL, CONFIG_MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
-K_THREAD_DEFINE(matter_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_STACK_SIZE,
-		matter_thread_fn, NULL, NULL, NULL,
-		CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
+K_THREAD_DEFINE(matter_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_STACK_SIZE, matter_thread_fn, NULL,
+		NULL, NULL, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
 static void zboss_do_local_leave(zb_uint8_t param)
 {
@@ -185,8 +183,7 @@ void switch_to_thread_radio(void)
 			k_sem_reset(&leave_done_sem);
 		}
 	} else {
-		LOG_WRN("Failed to schedule ZBOSS leave callback (%d), proceeding without leave",
-			zb_ret);
+		LOG_WRN("Failed to schedule ZBOSS leave callback (%d), proceeding without leave", zb_ret);
 	}
 	atomic_set(&g_matter_switch_pending_leave, 0);
 
@@ -216,8 +213,7 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 	switch (event->Type) {
 #ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
 	case chip::DeviceLayer::DeviceEventType::kCHIPoBLEAdvertisingChange:
-		if (event->CHIPoBLEAdvertisingChange.Result ==
-		    chip::DeviceLayer::kActivity_Started) {
+		if (event->CHIPoBLEAdvertisingChange.Result == chip::DeviceLayer::kActivity_Started) {
 			matter_board_init_signal();
 		}
 		break;
@@ -308,8 +304,7 @@ extern "C" void matter_zigbee_coexistence_on_server_started(void)
 	 * In Zigbee mode with no fabrics the kCHIPoBLEAdvertisingChange event
 	 * unblocks the worker; in all other cases (Matter mode, or Zigbee mode
 	 * with existing fabrics that suppress advertising) signal explicitly. */
-	if (protocol_state_get() == PROTOCOL_MATTER ||
-	    chip::Server::GetInstance().GetFabricTable().FabricCount() > 0) {
+	if (protocol_state_get() == PROTOCOL_MATTER || chip::Server::GetInstance().GetFabricTable().FabricCount() > 0) {
 		matter_board_init_signal();
 	}
 #else
@@ -335,7 +330,6 @@ extern "C" void matter_zigbee_coexistence_pre_server_init(void)
 #endif
 }
 
-
 extern "C" int matter_zigbee_coexistence_run(const struct matter_zigbee_coexistence_callbacks *cb)
 {
 	__ASSERT(cb != NULL, "Null callback table");
@@ -349,8 +343,7 @@ extern "C" int matter_zigbee_coexistence_run(const struct matter_zigbee_coexiste
 	ARG_UNUSED(ps_ret);
 
 	CHIP_ERROR err = Nrf::Matter::RegisterEventHandler(matter_event_handler, 0);
-	__ASSERT(err == CHIP_NO_ERROR, "Failed to register Matter event handler: %" CHIP_ERROR_FORMAT,
-		 err.Format());
+	__ASSERT(err == CHIP_NO_ERROR, "Failed to register Matter event handler: %" CHIP_ERROR_FORMAT, err.Format());
 	ARG_UNUSED(err);
 
 	k_thread_start(zigbee_thread_id);
@@ -387,8 +380,7 @@ extern "C" void matter_zigbee_coexistence_handle_zboss_signal(zb_bufid_t bufid)
 	}
 }
 
-extern "C" bool matter_zigbee_coexistence_process_switch_button(uint32_t button_state,
-								uint32_t has_changed,
+extern "C" bool matter_zigbee_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
 								uint32_t switch_button)
 {
 	if (switch_button == 0U) {

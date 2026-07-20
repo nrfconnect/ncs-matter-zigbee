@@ -80,9 +80,9 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 #if defined(CONFIG_PWM)
 		AppTask::Instance().InitPWMDDevice();
 
-		AppTask::Instance().GetPWMDevice().InitiateAction(
-			storedValue ? Nrf::PWMDevice::ON_ACTION : Nrf::PWMDevice::OFF_ACTION,
-			static_cast<int32_t>(LightingActor::Remote), nullptr);
+		AppTask::Instance().GetPWMDevice().InitiateAction(storedValue ? Nrf::PWMDevice::ON_ACTION :
+										Nrf::PWMDevice::OFF_ACTION,
+								  static_cast<int32_t>(LightingActor::Remote), nullptr);
 #else
 		Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(storedValue);
 #endif

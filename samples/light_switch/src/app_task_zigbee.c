@@ -12,28 +12,28 @@
 
 #include "app_task_zigbee.h"
 
-#include <matter_zigbee_protocol_state.h>
 #include <matter_zigbee_coexistence.h>
+#include <matter_zigbee_protocol_state.h>
 
-#include <zephyr/kernel.h>
-#include <zephyr/sys/util.h>
-#include <zephyr/device.h>
-#include <zephyr/logging/log.h>
 #include <dk_buttons_and_leds.h>
 #include <ram_pwrdn.h>
+#include <zephyr/device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 
+#include "zb_dimmer_switch.h"
+#include "zb_mem_config_custom.h"
+#include <zb_nrf_platform.h>
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
 #include <zboss_api_zcl.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
-#include <zb_nrf_platform.h>
-#include "zb_mem_config_custom.h"
-#include "zb_dimmer_switch.h"
 
 #if CONFIG_ZIGBEE_FOTA
-#include <zigbee/zigbee_fota.h>
 #include <zephyr/sys/reboot.h>
+#include <zigbee/zigbee_fota.h>
 #endif /* CONFIG_ZIGBEE_FOTA */
 
 #if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
@@ -42,7 +42,7 @@
 
 #if CONFIG_ZIGBEE_FOTA
 /* LED indicating OTA Client Activity. */
-#define OTA_ACTIVITY_LED          DK_LED2
+#define OTA_ACTIVITY_LED DK_LED2
 #endif /* CONFIG_ZIGBEE_FOTA */
 
 #ifdef CONFIG_ZIGBEE_BT_DFU
@@ -53,73 +53,73 @@
 #include "nus_cmd.h"
 
 /* LED which indicates that Central is connected. */
-#define NUS_STATUS_LED            DK_LED1
+#define NUS_STATUS_LED DK_LED1
 /* UART command that will turn on found light bulb(s). */
-#define COMMAND_ON                "n"
+#define COMMAND_ON "n"
 /**< UART command that will turn off found light bulb(s). */
-#define COMMAND_OFF               "f"
+#define COMMAND_OFF "f"
 /**< UART command that will turn toggle found light bulb(s). */
-#define COMMAND_TOGGLE            "t"
+#define COMMAND_TOGGLE "t"
 /**< UART command that will increase brightness of found light bulb(s). */
-#define COMMAND_INCREASE          "i"
+#define COMMAND_INCREASE "i"
 /**< UART command that will decrease brightness of found light bulb(s). */
-#define COMMAND_DECREASE          "d"
+#define COMMAND_DECREASE "d"
 #endif /* CONFIG_BT_NUS */
 
 /* Source endpoint used to control light bulb. */
-#define LIGHT_SWITCH_ENDPOINT      1
+#define LIGHT_SWITCH_ENDPOINT 1
 /* Delay between the light switch startup and light bulb finding procedure. */
 #define MATCH_DESC_REQ_START_DELAY K_SECONDS(2)
 /* Timeout for finding procedure. */
-#define MATCH_DESC_REQ_TIMEOUT     K_SECONDS(5)
+#define MATCH_DESC_REQ_TIMEOUT K_SECONDS(5)
 /* Find only non-sleepy device. */
-#define MATCH_DESC_REQ_ROLE        ZB_NWK_BROADCAST_RX_ON_WHEN_IDLE
+#define MATCH_DESC_REQ_ROLE ZB_NWK_BROADCAST_RX_ON_WHEN_IDLE
 
 /* Do not erase NVRAM to save the network parameters after device reboot or
  * power-off. NOTE: If this option is set to ZB_TRUE then do full device erase
  * for all network devices before running other samples.
  */
-#define ERASE_PERSISTENT_CONFIG    ZB_FALSE
+#define ERASE_PERSISTENT_CONFIG ZB_FALSE
 /* LED indicating that light switch successfully joind Zigbee network. */
-#define ZIGBEE_NETWORK_STATE_LED   DK_LED3
+#define ZIGBEE_NETWORK_STATE_LED DK_LED3
 /* LED used for device identification. */
-#define IDENTIFY_LED               ZIGBEE_NETWORK_STATE_LED
+#define IDENTIFY_LED ZIGBEE_NETWORK_STATE_LED
 /* LED indicating that light witch found a light bulb to control. */
-#define BULB_FOUND_LED             DK_LED4
+#define BULB_FOUND_LED DK_LED4
 /* Button ID used to switch on the light bulb. */
-#define BUTTON_ON                  DK_BTN1_MSK
+#define BUTTON_ON DK_BTN1_MSK
 /* Button ID used to switch off the light bulb. */
-#define BUTTON_OFF                 DK_BTN2_MSK
+#define BUTTON_OFF DK_BTN2_MSK
 /* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
-#define DIMM_STEP                  15
+#define DIMM_STEP 15
 /* Button ID used to enable sleepy behavior (sampled once at boot). */
-#define BUTTON_SLEEPY              DK_BTN3_MSK
+#define BUTTON_SLEEPY DK_BTN3_MSK
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 /* Short press starts Touchlink. */
-#define BUTTON_TOUCHLINK           DK_BTN3_MSK
+#define BUTTON_TOUCHLINK DK_BTN3_MSK
 #endif
 
 #if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
 /* Long press switches protocol in coex builds. */
-#define PROTOCOL_SWITCH_BUTTON     DK_BTN3_MSK
+#define PROTOCOL_SWITCH_BUTTON DK_BTN3_MSK
 #endif
 
 /* Button to start Factory Reset */
-#define FACTORY_RESET_BUTTON       DK_BTN4_MSK
+#define FACTORY_RESET_BUTTON DK_BTN4_MSK
 
 /* Button used to enter the Identify mode. */
-#define IDENTIFY_MODE_BUTTON       DK_BTN4_MSK
+#define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
 
 /* Transition time for a single step operation in 0.1 sec units.
  * 0xFFFF - immediate change.
  */
-#define DIMM_TRANSACTION_TIME      2
+#define DIMM_TRANSACTION_TIME 2
 
 /* Time after which the button state is checked again to detect button hold,
  * the dimm command is sent again.
  */
-#define BUTTON_LONG_POLL_TMO       K_MSEC(500)
+#define BUTTON_LONG_POLL_TMO K_MSEC(500)
 
 #if !defined ZB_ED_ROLE
 #error Define ZB_ED_ROLE to compile light switch (End Device) source code.
@@ -129,13 +129,32 @@ LOG_MODULE_REGISTER(zb_lightswitch, LOG_LEVEL_INF);
 
 /* Helper functions for LED control in low power mode */
 #if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
-static inline void led_set(uint32_t led, uint32_t val) { ARG_UNUSED(led); ARG_UNUSED(val); }
-static inline void led_set_on(uint32_t led) { ARG_UNUSED(led); }
-static inline void led_set_off(uint32_t led) { ARG_UNUSED(led); }
+static inline void led_set(uint32_t led, uint32_t val)
+{
+	ARG_UNUSED(led);
+	ARG_UNUSED(val);
+}
+static inline void led_set_on(uint32_t led)
+{
+	ARG_UNUSED(led);
+}
+static inline void led_set_off(uint32_t led)
+{
+	ARG_UNUSED(led);
+}
 #else
-static inline void led_set(uint32_t led, uint32_t val) { dk_set_led(led, val); }
-static inline void led_set_on(uint32_t led) { dk_set_led_on(led); }
-static inline void led_set_off(uint32_t led) { dk_set_led_off(led); }
+static inline void led_set(uint32_t led, uint32_t val)
+{
+	dk_set_led(led, val);
+}
+static inline void led_set_on(uint32_t led)
+{
+	dk_set_led_on(led);
+}
+static inline void led_set_off(uint32_t led)
+{
+	dk_set_led_off(led);
+}
 #endif
 
 struct bulb_context {
@@ -160,52 +179,34 @@ static struct buttons_context buttons_ctx;
 static struct zb_device_ctx dev_ctx;
 
 /* Declare attribute list for Basic cluster (server). */
-ZB_ZCL_DECLARE_BASIC_SERVER_ATTRIB_LIST(
-	basic_server_attr_list,
-	&dev_ctx.basic_attr.zcl_version,
-	&dev_ctx.basic_attr.power_source);
+ZB_ZCL_DECLARE_BASIC_SERVER_ATTRIB_LIST(basic_server_attr_list, &dev_ctx.basic_attr.zcl_version,
+					&dev_ctx.basic_attr.power_source);
 
 /* Declare attribute list for Identify cluster (client). */
-ZB_ZCL_DECLARE_IDENTIFY_CLIENT_ATTRIB_LIST(
-	identify_client_attr_list);
+ZB_ZCL_DECLARE_IDENTIFY_CLIENT_ATTRIB_LIST(identify_client_attr_list);
 
 /* Declare attribute list for Identify cluster (server). */
-ZB_ZCL_DECLARE_IDENTIFY_SERVER_ATTRIB_LIST(
-	identify_server_attr_list,
-	&dev_ctx.identify_attr.identify_time);
+ZB_ZCL_DECLARE_IDENTIFY_SERVER_ATTRIB_LIST(identify_server_attr_list, &dev_ctx.identify_attr.identify_time);
 
 /* Declare attribute list for Scenes cluster (client). */
-ZB_ZCL_DECLARE_SCENES_CLIENT_ATTRIB_LIST(
-	scenes_client_attr_list);
+ZB_ZCL_DECLARE_SCENES_CLIENT_ATTRIB_LIST(scenes_client_attr_list);
 
 /* Declare attribute list for Groups cluster (client). */
-ZB_ZCL_DECLARE_GROUPS_CLIENT_ATTRIB_LIST(
-	groups_client_attr_list);
+ZB_ZCL_DECLARE_GROUPS_CLIENT_ATTRIB_LIST(groups_client_attr_list);
 
 /* Declare attribute list for On/Off cluster (client). */
-ZB_ZCL_DECLARE_ON_OFF_CLIENT_ATTRIB_LIST(
-	on_off_client_attr_list);
+ZB_ZCL_DECLARE_ON_OFF_CLIENT_ATTRIB_LIST(on_off_client_attr_list);
 
 /* Declare attribute list for Level control cluster (client). */
-ZB_ZCL_DECLARE_LEVEL_CONTROL_CLIENT_ATTRIB_LIST(
-	level_control_client_attr_list);
+ZB_ZCL_DECLARE_LEVEL_CONTROL_CLIENT_ATTRIB_LIST(level_control_client_attr_list);
 
 /* Declare cluster list for Dimmer Switch device. */
-ZB_DECLARE_DIMMER_SWITCH_CLUSTER_LIST(
-	dimmer_switch_clusters,
-	basic_server_attr_list,
-	identify_client_attr_list,
-	identify_server_attr_list,
-	scenes_client_attr_list,
-	groups_client_attr_list,
-	on_off_client_attr_list,
-	level_control_client_attr_list);
+ZB_DECLARE_DIMMER_SWITCH_CLUSTER_LIST(dimmer_switch_clusters, basic_server_attr_list, identify_client_attr_list,
+				      identify_server_attr_list, scenes_client_attr_list, groups_client_attr_list,
+				      on_off_client_attr_list, level_control_client_attr_list);
 
 /* Declare endpoint for Dimmer Switch device. */
-ZB_DECLARE_DIMMER_SWITCH_EP(
-	dimmer_switch_ep,
-	LIGHT_SWITCH_ENDPOINT,
-	dimmer_switch_clusters);
+ZB_DECLARE_DIMMER_SWITCH_EP(dimmer_switch_ep, LIGHT_SWITCH_ENDPOINT, dimmer_switch_clusters);
 
 /* Declare application's device context (list of registered endpoints)
  * for Dimmer Switch device.
@@ -214,14 +215,12 @@ ZB_DECLARE_DIMMER_SWITCH_EP(
 ZBOSS_DECLARE_DEVICE_CTX_1_EP(dimmer_switch_ctx, dimmer_switch_ep);
 #else
 
-  #if LIGHT_SWITCH_ENDPOINT == CONFIG_ZIGBEE_FOTA_ENDPOINT
-    #error "Light switch and Zigbee OTA endpoints should be different."
-  #endif
+#if LIGHT_SWITCH_ENDPOINT == CONFIG_ZIGBEE_FOTA_ENDPOINT
+#error "Light switch and Zigbee OTA endpoints should be different."
+#endif
 
 extern zb_af_endpoint_desc_t zigbee_fota_client_ep;
-ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmer_switch_ctx,
-			      zigbee_fota_client_ep,
-			      dimmer_switch_ep);
+ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmer_switch_ctx, zigbee_fota_client_ep, dimmer_switch_ep);
 #endif /* CONFIG_ZIGBEE_FOTA */
 
 /* Forward declarations. */
@@ -229,7 +228,6 @@ static void light_switch_button_handler(struct k_timer *timer);
 static void find_light_bulb_alarm(struct k_timer *timer);
 static void find_light_bulb(zb_bufid_t bufid);
 static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t on_off);
-
 
 /**@brief Starts identifying the device.
  *
@@ -243,9 +241,7 @@ static void start_identifying(zb_bufid_t bufid)
 		/* Check if endpoint is in identifying mode,
 		 * if not, put desired endpoint in identifying mode.
 		 */
-		if (dev_ctx.identify_attr.identify_time ==
-		    ZB_ZCL_IDENTIFY_IDENTIFY_TIME_DEFAULT_VALUE) {
-
+		if (dev_ctx.identify_attr.identify_time == ZB_ZCL_IDENTIFY_IDENTIFY_TIME_DEFAULT_VALUE) {
 			zb_ret_t zb_err_code = zb_bdb_finding_binding_target(LIGHT_SWITCH_ENDPOINT);
 
 			if (zb_err_code == RET_OK) {
@@ -293,11 +289,9 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 #if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 	bool protocol_switch_short_release =
-		matter_zigbee_coexistence_process_switch_button(button_state, has_changed,
-								PROTOCOL_SWITCH_BUTTON);
+		matter_zigbee_coexistence_process_switch_button(button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
 #else
-	(void)matter_zigbee_coexistence_process_switch_button(button_state, has_changed,
-							      PROTOCOL_SWITCH_BUTTON);
+	(void)matter_zigbee_coexistence_process_switch_button(button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
 #endif
 #endif
 
@@ -312,8 +306,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	check_factory_reset_button(button_state, has_changed);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-#if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE) && \
-	defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
+#if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE) && defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
 	if (protocol_switch_short_release) {
 		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
 		return;
@@ -348,7 +341,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 			if (was_factory_reset_done()) {
 				/* The long press was for Factory Reset */
 				LOG_DBG("After Factory Reset - ignore button release");
-			} else   {
+			} else {
 				/* Button released before Factory Reset */
 
 				/* Start identification mode */
@@ -370,8 +363,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 		/* Alarm can be scheduled only once. Next alarm only resets
 		 * counting.
 		 */
-		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO,
-			      K_NO_WAIT);
+		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO, K_NO_WAIT);
 		break;
 	case 0:
 		LOG_DBG("Button released");
@@ -380,8 +372,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 
 		if (atomic_set(&buttons_ctx.long_poll, ZB_FALSE) == ZB_FALSE) {
 			/* Allocate output buffer and send on/off command. */
-			zb_err_code = zb_buf_get_out_delayed_ext(
-				light_switch_send_on_off, cmd_id, 0);
+			zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_on_off, cmd_id, 0);
 			ZB_ERROR_CHECK(zb_err_code);
 		}
 		break;
@@ -493,14 +484,8 @@ static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
 {
 	LOG_INF("Send ON/OFF command: %d", cmd_id);
 
-	ZB_ZCL_ON_OFF_SEND_REQ(bufid,
-			       bulb_ctx.short_addr,
-			       ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-			       bulb_ctx.endpoint,
-			       LIGHT_SWITCH_ENDPOINT,
-			       ZB_AF_HA_PROFILE_ID,
-			       ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
-			       cmd_id,
+	ZB_ZCL_ON_OFF_SEND_REQ(bufid, bulb_ctx.short_addr, ZB_APS_ADDR_MODE_16_ENDP_PRESENT, bulb_ctx.endpoint,
+			       LIGHT_SWITCH_ENDPOINT, ZB_AF_HA_PROFILE_ID, ZB_ZCL_DISABLE_DEFAULT_RESPONSE, cmd_id,
 			       NULL);
 }
 
@@ -514,16 +499,9 @@ static void light_switch_send_step(zb_bufid_t bufid, zb_uint16_t cmd_id)
 {
 	LOG_INF("Send step level command: %d", cmd_id);
 
-	ZB_ZCL_LEVEL_CONTROL_SEND_STEP_REQ(bufid,
-					   bulb_ctx.short_addr,
-					   ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-					   bulb_ctx.endpoint,
-					   LIGHT_SWITCH_ENDPOINT,
-					   ZB_AF_HA_PROFILE_ID,
-					   ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
-					   NULL,
-					   cmd_id,
-					   DIMM_STEP,
+	ZB_ZCL_LEVEL_CONTROL_SEND_STEP_REQ(bufid, bulb_ctx.short_addr, ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
+					   bulb_ctx.endpoint, LIGHT_SWITCH_ENDPOINT, ZB_AF_HA_PROFILE_ID,
+					   ZB_ZCL_DISABLE_DEFAULT_RESPONSE, NULL, cmd_id, DIMM_STEP,
 					   DIMM_TRANSACTION_TIME);
 }
 
@@ -535,19 +513,14 @@ static void light_switch_send_step(zb_bufid_t bufid, zb_uint16_t cmd_id)
 static void find_light_bulb_cb(zb_bufid_t bufid)
 {
 	/* Get the beginning of the response. */
-	zb_zdo_match_desc_resp_t *resp =
-		(zb_zdo_match_desc_resp_t *) zb_buf_begin(bufid);
+	zb_zdo_match_desc_resp_t *resp = (zb_zdo_match_desc_resp_t *)zb_buf_begin(bufid);
 	/* Get the pointer to the parameters buffer, which stores APS layer
 	 * response.
 	 */
-	zb_apsde_data_indication_t *ind = ZB_BUF_GET_PARAM(bufid,
-							   zb_apsde_data_indication_t);
+	zb_apsde_data_indication_t *ind = ZB_BUF_GET_PARAM(bufid, zb_apsde_data_indication_t);
 	zb_uint8_t *match_ep;
 
-	if ((resp->status == ZB_ZDP_STATUS_SUCCESS) &&
-	    (resp->match_len > 0) &&
-	    (bulb_ctx.short_addr == 0xFFFF)) {
-
+	if ((resp->status == ZB_ZDP_STATUS_SUCCESS) && (resp->match_len > 0) && (bulb_ctx.short_addr == 0xFFFF)) {
 		/* Match EP list follows right after response header. */
 		match_ep = (zb_uint8_t *)(resp + 1);
 
@@ -557,9 +530,7 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
 		bulb_ctx.endpoint = *match_ep;
 		bulb_ctx.short_addr = ind->src_addr;
 
-		LOG_INF("Found bulb addr: %d ep: %d",
-			bulb_ctx.short_addr,
-			bulb_ctx.endpoint);
+		LOG_INF("Found bulb addr: %d ep: %d", bulb_ctx.short_addr, bulb_ctx.endpoint);
 
 		k_timer_stop(&bulb_ctx.find_alarm);
 		led_set_on(BULB_FOUND_LED);
@@ -602,8 +573,7 @@ static void find_light_bulb(zb_bufid_t bufid)
 	/* Initialize pointers inside buffer and reserve space for
 	 * zb_zdo_match_desc_param_t request.
 	 */
-	req = zb_buf_initial_alloc(bufid,
-				   sizeof(zb_zdo_match_desc_param_t) + (1) * sizeof(zb_uint16_t));
+	req = zb_buf_initial_alloc(bufid, sizeof(zb_zdo_match_desc_param_t) + (1) * sizeof(zb_uint16_t));
 
 	req->nwk_addr = MATCH_DESC_REQ_ROLE;
 	req->addr_of_interest = MATCH_DESC_REQ_ROLE;
@@ -647,15 +617,12 @@ static void light_switch_button_handler(struct k_timer *timer)
 		}
 
 		/* Allocate output buffer and send step command. */
-		zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_step,
-							 cmd_id,
-							 0);
+		zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_step, cmd_id, 0);
 		if (zb_err_code != RET_OK) {
 			LOG_ERR("Failed to schedule buffer allocation: %d", zb_err_code);
 		}
 
-		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO,
-			      K_NO_WAIT);
+		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO, K_NO_WAIT);
 	} else {
 		atomic_set(&buttons_ctx.long_poll, ZB_FALSE);
 	}
@@ -710,8 +677,7 @@ static void ota_evt_handler(const struct zigbee_fota_evt *evt)
  */
 static void zcl_device_cb(zb_bufid_t bufid)
 {
-	zb_zcl_device_callback_param_t *device_cb_param =
-		ZB_BUF_GET_PARAM(bufid, zb_zcl_device_callback_param_t);
+	zb_zcl_device_callback_param_t *device_cb_param = ZB_BUF_GET_PARAM(bufid, zb_zcl_device_callback_param_t);
 
 	if (device_cb_param->device_cb_id == ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID) {
 		zigbee_fota_zcl_cb(bufid);
@@ -752,9 +718,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 			LOG_INF("Touchlink done: start finding bulb");
 			zb_zdo_pim_set_long_poll_interval(3000);
 			if (bulb_ctx.short_addr == 0xFFFF) {
-				k_timer_start(&bulb_ctx.find_alarm,
-					      MATCH_DESC_REQ_START_DELAY,
-					      MATCH_DESC_REQ_TIMEOUT);
+				k_timer_start(&bulb_ctx.find_alarm, MATCH_DESC_REQ_START_DELAY, MATCH_DESC_REQ_TIMEOUT);
 			}
 		}
 		break;
@@ -769,9 +733,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 			/* Check the light device address. */
 			if (bulb_ctx.short_addr == 0xFFFF) {
-				k_timer_start(&bulb_ctx.find_alarm,
-					      MATCH_DESC_REQ_START_DELAY,
-					      MATCH_DESC_REQ_TIMEOUT);
+				k_timer_start(&bulb_ctx.find_alarm, MATCH_DESC_REQ_START_DELAY, MATCH_DESC_REQ_TIMEOUT);
 			}
 		}
 		break;
@@ -805,36 +767,31 @@ void zboss_signal_handler(zb_bufid_t bufid)
 static void turn_on_cmd(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	zb_buf_get_out_delayed_ext(light_switch_send_on_off,
-				   ZB_ZCL_CMD_ON_OFF_ON_ID, 0);
+	zb_buf_get_out_delayed_ext(light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_ON_ID, 0);
 }
 
 static void turn_off_cmd(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	zb_buf_get_out_delayed_ext(light_switch_send_on_off,
-				   ZB_ZCL_CMD_ON_OFF_OFF_ID, 0);
+	zb_buf_get_out_delayed_ext(light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_OFF_ID, 0);
 }
 
 static void toggle_cmd(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	zb_buf_get_out_delayed_ext(light_switch_send_on_off,
-				   ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+	zb_buf_get_out_delayed_ext(light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
 }
 
 static void increase_cmd(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	zb_buf_get_out_delayed_ext(light_switch_send_step,
-				   ZB_ZCL_LEVEL_CONTROL_STEP_MODE_UP, 0);
+	zb_buf_get_out_delayed_ext(light_switch_send_step, ZB_ZCL_LEVEL_CONTROL_STEP_MODE_UP, 0);
 }
 
 static void decrease_cmd(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	zb_buf_get_out_delayed_ext(light_switch_send_step,
-				   ZB_ZCL_LEVEL_CONTROL_STEP_MODE_DOWN, 0);
+	zb_buf_get_out_delayed_ext(light_switch_send_step, ZB_ZCL_LEVEL_CONTROL_STEP_MODE_DOWN, 0);
 }
 
 static void on_nus_connect(struct k_work *item)
@@ -850,12 +807,9 @@ static void on_nus_disconnect(struct k_work *item)
 }
 
 static struct nus_entry commands[] = {
-	NUS_COMMAND(COMMAND_ON, turn_on_cmd),
-	NUS_COMMAND(COMMAND_OFF, turn_off_cmd),
-	NUS_COMMAND(COMMAND_TOGGLE, toggle_cmd),
-	NUS_COMMAND(COMMAND_INCREASE, increase_cmd),
-	NUS_COMMAND(COMMAND_DECREASE, decrease_cmd),
-	NUS_COMMAND(NULL, NULL),
+	NUS_COMMAND(COMMAND_ON, turn_on_cmd),	     NUS_COMMAND(COMMAND_OFF, turn_off_cmd),
+	NUS_COMMAND(COMMAND_TOGGLE, toggle_cmd),     NUS_COMMAND(COMMAND_INCREASE, increase_cmd),
+	NUS_COMMAND(COMMAND_DECREASE, decrease_cmd), NUS_COMMAND(NULL, NULL),
 };
 
 #endif /* CONFIG_BT_NUS */
@@ -889,8 +843,8 @@ static void tx_power_cb(zb_bufid_t param)
 		break;
 	}
 
-	LOG_INF("Zigbee transceiver tx power set result (pg: %d, ch: %d, pw: %d): %s",
-		power_params->page, power_params->channel, power_params->tx_power, status);
+	LOG_INF("Zigbee transceiver tx power set result (pg: %d, ch: %d, pw: %d): %s", power_params->page,
+		power_params->channel, power_params->tx_power, status);
 
 	zb_buf_free(param);
 }
@@ -933,12 +887,10 @@ void set_tx_power(void)
 
 	for (; channel <= ZB_PAGE0_2_4_GHZ_CHANNEL_TO; channel++) {
 		if (channel_mask & (1 << channel)) {
-			LOG_INF("Setting tx power for channel %d: %d dBm", channel,
-				CONFIG_LIGHT_SWITCH_TX_POWER);
+			LOG_INF("Setting tx power for channel %d: %d dBm", channel, CONFIG_LIGHT_SWITCH_TX_POWER);
 			ret = zb_buf_get_out_delayed_ext(schedule_tx_power_set, channel, 0);
 			if (ret != RET_OK) {
-				LOG_ERR("Failed to set tx power for channel %d, error %d",
-					channel, ret);
+				LOG_ERR("Failed to set tx power for channel %d, error %d", channel, ret);
 			}
 		}
 	}

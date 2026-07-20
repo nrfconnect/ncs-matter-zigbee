@@ -34,16 +34,16 @@ using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
 
-namespace {
+namespace
+{
 constexpr EndpointId kLightEndpointId = 1;
 constexpr uint8_t kDefaultMinLevel = 0;
 constexpr uint8_t kDefaultMaxLevel = 254;
 
 Nrf::Matter::IdentifyCluster sIdentifyCluster(kLightEndpointId, true, []() {
-  Nrf::PostTask(
-      [] { Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(false); });
+	Nrf::PostTask([] { Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(false); });
 #if defined(CONFIG_PWM)
-  Nrf::PostTask([] { AppTask::Instance().GetPWMDevice().ApplyLevel(); });
+	Nrf::PostTask([] { AppTask::Instance().GetPWMDevice().ApplyLevel(); });
 #endif
 });
 
@@ -59,186 +59,176 @@ const struct pwm_dt_spec sLightPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
  * buffer with a value to be written, so it must live so long as the
  * DeferredAttributePersistenceProvider object.
  */
-DeferredAttribute gCurrentLevelPersister(ConcreteAttributePath(
-    kLightEndpointId, Clusters::LevelControl::Id,
-    Clusters::LevelControl::Attributes::CurrentLevel::Id));
+DeferredAttribute gCurrentLevelPersister(ConcreteAttributePath(kLightEndpointId, Clusters::LevelControl::Id,
+							       Clusters::LevelControl::Attributes::CurrentLevel::Id));
 
 /* Deferred persistence will be auto-initialized as soon as the default
  * persistence is initialized */
 DefaultAttributePersistenceProvider gSimpleAttributePersistence;
-DeferredAttributePersistenceProvider gDeferredAttributePersister(
-    gSimpleAttributePersistence,
-    Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
-    System::Clock::Milliseconds32(5000));
+DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence,
+								 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
+								 System::Clock::Milliseconds32(5000));
 
 #define APPLICATION_BUTTON_MASK DK_BTN2_MSK
 } /* namespace */
 
-void AppTask::LightingActionEventHandler(const LightingEvent &event) {
+void AppTask::LightingActionEventHandler(const LightingEvent &event)
+{
 #if defined(CONFIG_PWM)
-  Nrf::PWMDevice::Action_t action = Nrf::PWMDevice::INVALID_ACTION;
-  int32_t actor = 0;
-  if (event.Actor == LightingActor::Button) {
-    action = Instance().mPWMDevice.IsTurnedOn() ? Nrf::PWMDevice::OFF_ACTION
-                                                : Nrf::PWMDevice::ON_ACTION;
-    actor = static_cast<int32_t>(event.Actor);
-  }
+	Nrf::PWMDevice::Action_t action = Nrf::PWMDevice::INVALID_ACTION;
+	int32_t actor = 0;
+	if (event.Actor == LightingActor::Button) {
+		action = Instance().mPWMDevice.IsTurnedOn() ? Nrf::PWMDevice::OFF_ACTION : Nrf::PWMDevice::ON_ACTION;
+		actor = static_cast<int32_t>(event.Actor);
+	}
 
-  if (action == Nrf::PWMDevice::INVALID_ACTION ||
-      !Instance().mPWMDevice.InitiateAction(action, actor, NULL)) {
-    LOG_INF("An action could not be initiated.");
-  }
+	if (action == Nrf::PWMDevice::INVALID_ACTION || !Instance().mPWMDevice.InitiateAction(action, actor, NULL)) {
+		LOG_INF("An action could not be initiated.");
+	}
 #else
-  Nrf::GetBoard()
-      .GetLED(Nrf::DeviceLeds::LED2)
-      .Set(!Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState());
+	Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(!Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState());
 #endif
 }
 
-void AppTask::ButtonEventHandler(Nrf::ButtonState state,
-                                 Nrf::ButtonMask hasChanged) {
-  if ((APPLICATION_BUTTON_MASK & hasChanged) & state) {
-    Nrf::PostTask([] {
-      LightingEvent event;
-      event.Actor = LightingActor::Button;
-      LightingActionEventHandler(event);
-    });
-  }
+void AppTask::ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged)
+{
+	if ((APPLICATION_BUTTON_MASK & hasChanged) & state) {
+		Nrf::PostTask([] {
+			LightingEvent event;
+			event.Actor = LightingActor::Button;
+			LightingActionEventHandler(event);
+		});
+	}
 }
 
 #if defined(CONFIG_PWM)
-void AppTask::ActionInitiated(Nrf::PWMDevice::Action_t action, int32_t actor) {
-  if (action == Nrf::PWMDevice::ON_ACTION) {
-    LOG_INF("Turn On Action has been initiated");
-  } else if (action == Nrf::PWMDevice::OFF_ACTION) {
-    LOG_INF("Turn Off Action has been initiated");
-  } else if (action == Nrf::PWMDevice::LEVEL_ACTION) {
-    LOG_INF("Level Action has been initiated");
-  }
+void AppTask::ActionInitiated(Nrf::PWMDevice::Action_t action, int32_t actor)
+{
+	if (action == Nrf::PWMDevice::ON_ACTION) {
+		LOG_INF("Turn On Action has been initiated");
+	} else if (action == Nrf::PWMDevice::OFF_ACTION) {
+		LOG_INF("Turn Off Action has been initiated");
+	} else if (action == Nrf::PWMDevice::LEVEL_ACTION) {
+		LOG_INF("Level Action has been initiated");
+	}
 }
 
-void AppTask::ActionCompleted(Nrf::PWMDevice::Action_t action, int32_t actor) {
-  if (action == Nrf::PWMDevice::ON_ACTION) {
-    LOG_INF("Turn On Action has been completed");
-  } else if (action == Nrf::PWMDevice::OFF_ACTION) {
-    LOG_INF("Turn Off Action has been completed");
-  } else if (action == Nrf::PWMDevice::LEVEL_ACTION) {
-    LOG_INF("Level Action has been completed");
-  }
+void AppTask::ActionCompleted(Nrf::PWMDevice::Action_t action, int32_t actor)
+{
+	if (action == Nrf::PWMDevice::ON_ACTION) {
+		LOG_INF("Turn On Action has been completed");
+	} else if (action == Nrf::PWMDevice::OFF_ACTION) {
+		LOG_INF("Turn Off Action has been completed");
+	} else if (action == Nrf::PWMDevice::LEVEL_ACTION) {
+		LOG_INF("Level Action has been completed");
+	}
 
-  if (actor == static_cast<int32_t>(LightingActor::Button)) {
-    Instance().UpdateClusterState();
-  }
+	if (actor == static_cast<int32_t>(LightingActor::Button)) {
+		Instance().UpdateClusterState();
+	}
 }
 #endif /* CONFIG_PWM */
 
-void AppTask::UpdateClusterState() {
-  SystemLayer().ScheduleLambda([this] {
+void AppTask::UpdateClusterState()
+{
+	SystemLayer().ScheduleLambda([this] {
 #if defined(CONFIG_PWM)
-    /* write the new on/off value */
-    Protocols::InteractionModel::Status status =
-        Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId,
-                                                mPWMDevice.IsTurnedOn());
+		/* write the new on/off value */
+		Protocols::InteractionModel::Status status =
+			Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, mPWMDevice.IsTurnedOn());
 #else
-    Protocols::InteractionModel::Status status =
-        Clusters::OnOff::Attributes::OnOff::Set(
-            kLightEndpointId,
-            Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState());
+		Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(
+			kLightEndpointId, Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState());
 #endif
-    if (status != Protocols::InteractionModel::Status::Success) {
-      LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
-    }
+		if (status != Protocols::InteractionModel::Status::Success) {
+			LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
+		}
 
 #if defined(CONFIG_PWM)
-    /* write the current level */
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(
-        kLightEndpointId, mPWMDevice.GetLevel());
+		/* write the current level */
+		status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, mPWMDevice.GetLevel());
 #else
-    /* write the current level */
-    if (Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState()) {
-      status = Clusters::LevelControl::Attributes::CurrentLevel::Set(
-          kLightEndpointId, 100);
-    } else {
-      status = Clusters::LevelControl::Attributes::CurrentLevel::Set(
-          kLightEndpointId, 0);
-    }
+		/* write the current level */
+		if (Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState()) {
+			status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, 100);
+		} else {
+			status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, 0);
+		}
 #endif
 
-    if (status != Protocols::InteractionModel::Status::Success) {
-      LOG_ERR("Updating level cluster failed: %x", to_underlying(status));
-    }
-  });
+		if (status != Protocols::InteractionModel::Status::Success) {
+			LOG_ERR("Updating level cluster failed: %x", to_underlying(status));
+		}
+	});
 }
 
-void AppTask::InitPWMDDevice() {
+void AppTask::InitPWMDDevice()
+{
 #if defined(CONFIG_PWM)
-  /* Initialize lighting device (PWM) */
-  uint8_t minLightLevel = kDefaultMinLevel;
-  Clusters::LevelControl::Attributes::MinLevel::Get(kLightEndpointId,
-                                                    &minLightLevel);
+	/* Initialize lighting device (PWM) */
+	uint8_t minLightLevel = kDefaultMinLevel;
+	Clusters::LevelControl::Attributes::MinLevel::Get(kLightEndpointId, &minLightLevel);
 
-  uint8_t maxLightLevel = kDefaultMaxLevel;
-  Clusters::LevelControl::Attributes::MaxLevel::Get(kLightEndpointId,
-                                                    &maxLightLevel);
+	uint8_t maxLightLevel = kDefaultMaxLevel;
+	Clusters::LevelControl::Attributes::MaxLevel::Get(kLightEndpointId, &maxLightLevel);
 
-  Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::Type currentLevel;
-  Clusters::LevelControl::Attributes::CurrentLevel::Get(kLightEndpointId,
-                                                        currentLevel);
+	Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::Type currentLevel;
+	Clusters::LevelControl::Attributes::CurrentLevel::Get(kLightEndpointId, currentLevel);
 
-  int ret = mPWMDevice.Init(&sLightPwmDevice, minLightLevel, maxLightLevel,
-                            currentLevel.ValueOr(kDefaultMaxLevel));
-  if (ret != 0) {
-    LOG_ERR("Failed to initialize PWD device.");
-  }
+	int ret =
+		mPWMDevice.Init(&sLightPwmDevice, minLightLevel, maxLightLevel, currentLevel.ValueOr(kDefaultMaxLevel));
+	if (ret != 0) {
+		LOG_ERR("Failed to initialize PWD device.");
+	}
 
-  mPWMDevice.SetCallbacks(ActionInitiated, ActionCompleted);
+	mPWMDevice.SetCallbacks(ActionInitiated, ActionCompleted);
 #endif
 }
 
-CHIP_ERROR AppTask::Init() {
-  /* Initialize Matter stack */
-  Nrf::Matter::InitData initData{};
-  initData.mPostServerInitClbk = []() {
-    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
-    gSimpleAttributePersistence.Init(
-        Nrf::Matter::GetPersistentStorageDelegate());
-    return CHIP_NO_ERROR;
-  };
+CHIP_ERROR AppTask::Init()
+{
+	/* Initialize Matter stack */
+	Nrf::Matter::InitData initData{};
+	initData.mPostServerInitClbk = []() {
+		app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+		gSimpleAttributePersistence.Init(Nrf::Matter::GetPersistentStorageDelegate());
+		return CHIP_NO_ERROR;
+	};
 #if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE)
-  initData.mPreServerInitClbk = []() -> CHIP_ERROR {
-    matter_zigbee_coexistence_pre_server_init();
-    return CHIP_NO_ERROR;
-  };
+	initData.mPreServerInitClbk = []() -> CHIP_ERROR {
+		matter_zigbee_coexistence_pre_server_init();
+		return CHIP_NO_ERROR;
+	};
 #endif
-  ReturnErrorOnFailure(Nrf::Matter::PrepareServer(initData));
+	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(initData));
 
-  if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
-    LOG_ERR("User interface initialization failed.");
-    return CHIP_ERROR_INCORRECT_STATE;
-  }
+	if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
+		LOG_ERR("User interface initialization failed.");
+		return CHIP_ERROR_INCORRECT_STATE;
+	}
 
-  /* Register Matter event handler that controls the connectivity status LED
-   * based on the captured Matter network state. */
-  ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(
-      Nrf::Board::DefaultMatterEventHandler, 0));
+	/* Register Matter event handler that controls the connectivity status LED
+	 * based on the captured Matter network state. */
+	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
-  ReturnErrorOnFailure(sIdentifyCluster.Init());
+	ReturnErrorOnFailure(sIdentifyCluster.Init());
 
-  ReturnErrorOnFailure(Nrf::Matter::StartServer());
+	ReturnErrorOnFailure(Nrf::Matter::StartServer());
 
 #if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE)
-  matter_zigbee_coexistence_on_server_started();
+	matter_zigbee_coexistence_on_server_started();
 #endif
 
-  return CHIP_NO_ERROR;
+	return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::StartApp() {
-  ReturnErrorOnFailure(Init());
+CHIP_ERROR AppTask::StartApp()
+{
+	ReturnErrorOnFailure(Init());
 
-  while (true) {
-    Nrf::DispatchNextTask();
-  }
+	while (true) {
+		Nrf::DispatchNextTask();
+	}
 
-  return CHIP_NO_ERROR;
+	return CHIP_NO_ERROR;
 }

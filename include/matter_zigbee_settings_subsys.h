@@ -19,7 +19,7 @@
 /** Leaf segment for the persisted active-protocol value. */
 #define MATTER_ZIGBEE_SETTINGS_KEY_PROTOCOL_STATE "pt"
 
-#define MATTER_ZIGBEE_SETTINGS_FULL_NAME_PROTOCOL_STATE \
+#define MATTER_ZIGBEE_SETTINGS_FULL_NAME_PROTOCOL_STATE                                                                \
 	ZIGBEE_SETTINGS_SUBSYS_NAME "/" MATTER_ZIGBEE_SETTINGS_KEY_PROTOCOL_STATE
 
 #endif /* MATTER_ZIGBEE_SETTINGS_SUBSYS_H_ */

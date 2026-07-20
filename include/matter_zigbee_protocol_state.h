@@ -28,10 +28,7 @@
 extern "C" {
 #endif
 
-typedef enum {
-	PROTOCOL_ZIGBEE,
-	PROTOCOL_MATTER
-} active_protocol_t;
+typedef enum { PROTOCOL_ZIGBEE, PROTOCOL_MATTER } active_protocol_t;
 
 /**
  * @brief Load the persisted protocol state from non-volatile storage.

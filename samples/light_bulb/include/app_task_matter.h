@@ -17,32 +17,32 @@ struct Identify;
 enum class LightingActor : uint8_t { Remote, Button };
 
 struct LightingEvent {
-  uint8_t Action;
-  LightingActor Actor;
+	uint8_t Action;
+	LightingActor Actor;
 };
 
 class AppTask {
 public:
-  static AppTask &Instance() {
-    static AppTask sAppTask;
-    return sAppTask;
-  };
+	static AppTask &Instance()
+	{
+		static AppTask sAppTask;
+		return sAppTask;
+	};
 
-  CHIP_ERROR StartApp();
+	CHIP_ERROR StartApp();
 
-  void UpdateClusterState();
-  void InitPWMDDevice();
-  Nrf::PWMDevice &GetPWMDevice() { return mPWMDevice; }
+	void UpdateClusterState();
+	void InitPWMDDevice();
+	Nrf::PWMDevice &GetPWMDevice() { return mPWMDevice; }
 
 private:
-  CHIP_ERROR Init();
+	CHIP_ERROR Init();
 
-  static void LightingActionEventHandler(const LightingEvent &event);
-  static void ButtonEventHandler(Nrf::ButtonState state,
-                                 Nrf::ButtonMask hasChanged);
+	static void LightingActionEventHandler(const LightingEvent &event);
+	static void ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged);
 
-  static void ActionInitiated(Nrf::PWMDevice::Action_t action, int32_t actor);
-  static void ActionCompleted(Nrf::PWMDevice::Action_t action, int32_t actor);
+	static void ActionInitiated(Nrf::PWMDevice::Action_t action, int32_t actor);
+	static void ActionCompleted(Nrf::PWMDevice::Action_t action, int32_t actor);
 
-  Nrf::PWMDevice mPWMDevice;
+	Nrf::PWMDevice mPWMDevice;
 };

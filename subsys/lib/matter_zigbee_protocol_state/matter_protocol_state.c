@@ -10,10 +10,10 @@
 #include <stdint.h>
 
 #include <zephyr/kernel.h>
-#include <zephyr/sys/util.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/atomic.h>
+#include <zephyr/sys/util.h>
 
 LOG_MODULE_REGISTER(matter_protocol_state, CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_LOG_LEVEL);
 
@@ -22,8 +22,7 @@ static atomic_t state_initialized = ATOMIC_INIT(0);
 static bool protocol_loaded_from_settings;
 static K_MUTEX_DEFINE(init_mutex);
 
-static int protocol_state_load_direct_cb(const char *key, size_t len,
-					 settings_read_cb read_cb, void *cb_arg,
+static int protocol_state_load_direct_cb(const char *key, size_t len, settings_read_cb read_cb, void *cb_arg,
 					 void *param)
 {
 	const char *next;
@@ -78,8 +77,7 @@ int protocol_state_init(void)
 		return rc;
 	}
 
-	(void)settings_load_subtree_direct(ZIGBEE_SETTINGS_SUBSYS_NAME,
-					   protocol_state_load_direct_cb, NULL);
+	(void)settings_load_subtree_direct(ZIGBEE_SETTINGS_SUBSYS_NAME, protocol_state_load_direct_cb, NULL);
 
 	if (!protocol_loaded_from_settings) {
 		atomic_set(&active_protocol, (atomic_val_t)protocol_state_get_default());
@@ -87,8 +85,7 @@ int protocol_state_init(void)
 
 	atomic_set(&state_initialized, 1);
 
-	LOG_INF("Boot protocol: %s",
-		atomic_get(&active_protocol) == PROTOCOL_MATTER ? "matter" : "zigbee");
+	LOG_INF("Boot protocol: %s", atomic_get(&active_protocol) == PROTOCOL_MATTER ? "matter" : "zigbee");
 
 	k_mutex_unlock(&init_mutex);
 	return 0;
