@@ -1,0 +1,17 @@
+.. ### nRF Connect SDK documentation
+
+.. _`nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/nrf/index.html
+.. _`Installing the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/nrf/installation/install_ncs.html
+.. _`Kconfig search`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/kconfig/index.html
+.. _`Configuring and building`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/nrf/app_dev/config_and_build/index.html
+.. _`Software maturity levels`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/nrf/releases_and_maturity/software_maturity.html
+.. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/nrf/app_dev/device_guides/nrf54l/index.html
+
+.. ### NCS Zephyr documentation set
+
+.. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
+.. _`nrf54lm20dk`: https://docs.nordicsemi.com/bundle/ncs-|ncs_version|/page/zephyr/boards/nordic/nrf54lm20dk/doc/index.html
+
+.. ### Matter and Zigbee add-on sources
+
+.. _`Matter and Zigbee Add-on`: https://github.com/nrfconnect/ncs-matter-zigbee
