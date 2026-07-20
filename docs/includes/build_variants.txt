@@ -1,0 +1,31 @@
+The samples in this add-on are combined Matter and Zigbee builds by default.
+The default :file:`prj.conf` enables Matter (``CONFIG_CHIP``), the ``CONFIG_MATTER_ZIGBEE_COEXISTENCE`` orchestration layer, and the matching static partition layout with the MCUboot secondary slot in internal RRAM.
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp --sysbuild
+
+The same configuration is supported on ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp``.
+
+On the nRF54L15 DK, the combined Matter and Zigbee image requires external flash for the MCUboot secondary slot due to the available internal slot size.
+To place the MCUboot secondary slot on external SPI NOR flash instead, pass the ``matter_fota_ext_flash`` snippet.
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp -S matter_fota_ext_flash --sysbuild
+   west build |sample dir| -b nrf54lm20dk/nrf54lm20a/cpuapp -S matter_fota_ext_flash --sysbuild
+
+To produce a size-optimized release build (no logging, console or shell), add :file:`matter_fota_release.conf` as an extra overlay:
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp -S matter_fota_ext_flash --sysbuild -DEXTRA_CONF_FILE='matter_fota_release.conf'
+
+Use ``nrf54lm20dk/nrf54lm20b/cpuapp`` as the board target for the nRF54LM20B SoC variant.
+
+.. include:: /includes/bt_dfu.txt
+
+See |sample limitations ref| for supported board targets and incompatible options.
