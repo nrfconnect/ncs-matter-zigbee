@@ -156,6 +156,9 @@ typedef struct {
 /* Zigbee device application context storage. */
 static bulb_device_ctx_t dev_ctx;
 
+/* Last non-zero brightness used when turning on with CurrentLevel == 0. */
+static zb_uint8_t s_last_on_level = ZB_ZCL_LEVEL_CONTROL_LEVEL_MAX_VALUE;
+
 ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(identify_attr_list, &dev_ctx.identify_attr.identify_time);
 
 ZB_ZCL_DECLARE_GROUPS_ATTRIB_LIST(groups_attr_list, &dev_ctx.groups_attr.name_support);
@@ -326,6 +329,19 @@ static void light_bulb_set_brightness(zb_uint8_t brightness_level)
 	}
 }
 
+/**@brief Return PWM brightness to apply when the bulb is turned on.
+ */
+static zb_uint8_t light_bulb_on_brightness(void)
+{
+	zb_uint8_t level = dev_ctx.level_control_attr.current_level;
+
+	if (level == 0U) {
+		level = s_last_on_level;
+	}
+
+	return level;
+}
+
 /**@brief Function for setting the light bulb brightness.
  *
  * @param[in] new_level   Light bulb brightness value.
@@ -333,6 +349,10 @@ static void light_bulb_set_brightness(zb_uint8_t brightness_level)
 static void level_control_set_value(zb_uint16_t new_level)
 {
 	LOG_INF("Set level value: %i", new_level);
+
+	if (new_level > 0U) {
+		s_last_on_level = new_level;
+	}
 
 	ZB_ZCL_SET_ATTRIBUTE(DIMMABLE_LIGHT_ENDPOINT, ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE,
 			     ZB_ZCL_ATTR_LEVEL_CONTROL_CURRENT_LEVEL_ID, (zb_uint8_t *)&new_level, ZB_FALSE);
@@ -352,7 +372,7 @@ static void on_off_set_value(zb_bool_t on)
 			     ZB_ZCL_ATTR_ON_OFF_ON_OFF_ID, (zb_uint8_t *)&on, ZB_FALSE);
 
 	if (on) {
-		light_bulb_set_brightness(dev_ctx.level_control_attr.current_level);
+		light_bulb_set_brightness(light_bulb_on_brightness());
 	} else {
 		light_bulb_set_brightness(0U);
 	}
@@ -388,7 +408,7 @@ static void identify_cb(zb_bufid_t bufid)
 		ZVUNUSED(zb_err_code);
 
 		if (dev_ctx.on_off_attr.on_off) {
-			light_bulb_set_brightness(dev_ctx.level_control_attr.current_level);
+			light_bulb_set_brightness(light_bulb_on_brightness());
 		} else {
 			light_bulb_set_brightness(0U);
 		}
@@ -621,7 +641,8 @@ extern "C" int ZigbeeStart(void)
 	if (dev_ctx.on_off_attr.on_off) {
 		level_control_set_value(dev_ctx.level_control_attr.current_level);
 	} else {
-		level_control_set_value(0U);
+		/* Keep CurrentLevel at its default; only drive PWM off. */
+		light_bulb_set_brightness(0U);
 	}
 
 #if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
