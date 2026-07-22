@@ -2,6 +2,7 @@ name: Documentation Publish
 
 permissions:
   contents: read
+  actions: read
   pull-requests: write
 
 on:
