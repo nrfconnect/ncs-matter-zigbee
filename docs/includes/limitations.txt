@@ -1,6 +1,6 @@
 The combined Matter and Zigbee application has the following limitations:
 
 * The 802.15.4 radio is time-shared, never concurrent: once the device runs on Matter, Zigbee is torn down until the active protocol changes again.
-  To switch back to Zigbee, ensure the ``CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH`` Kconfig option is enabled, then long-press the button.
-  Removing all Matter fabrics or triggering a Matter factory reset wipes Matter storage and resets the persisted protocol to the value selected by the ``CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL`` Kconfig option.
+  To switch back to Zigbee, ensure the :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH` Kconfig option is enabled, then long-press the button.
+  Removing all Matter fabrics or triggering a Matter factory reset wipes Matter storage and resets the persisted protocol to the value selected by the :option:`CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL` Kconfig option.
 * The memory footprint is tuned empirically for ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp``; porting to other targets requires revisiting the libc heap, ZBOSS thread, system work queue and partition sizes used by :file:`prj.conf`.

@@ -1,5 +1,5 @@
 The samples in this add-on are combined Matter and Zigbee builds by default.
-The default :file:`prj.conf` enables Matter (``CONFIG_CHIP``), the ``CONFIG_MATTER_ZIGBEE_COEXISTENCE`` orchestration layer, and the matching static partition layout with the MCUboot secondary slot in internal RRAM.
+The default :file:`prj.conf` enables Matter (``CONFIG_CHIP``), the :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE` orchestration layer, and the matching static partition layout with the MCUboot secondary slot in internal RRAM.
 
 .. parsed-literal::
    :class: highlight
