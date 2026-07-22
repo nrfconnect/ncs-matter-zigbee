@@ -372,7 +372,7 @@ static void on_off_set_value(zb_bool_t on)
 			     ZB_ZCL_ATTR_ON_OFF_ON_OFF_ID, (zb_uint8_t *)&on, ZB_FALSE);
 
 	if (on) {
-		light_bulb_set_brightness(light_bulb_on_brightness());
+		level_control_set_value(light_bulb_on_brightness());
 	} else {
 		light_bulb_set_brightness(0U);
 	}
@@ -408,7 +408,7 @@ static void identify_cb(zb_bufid_t bufid)
 		ZVUNUSED(zb_err_code);
 
 		if (dev_ctx.on_off_attr.on_off) {
-			light_bulb_set_brightness(light_bulb_on_brightness());
+			level_control_set_value(light_bulb_on_brightness());
 		} else {
 			light_bulb_set_brightness(0U);
 		}
