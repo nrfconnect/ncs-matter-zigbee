@@ -85,6 +85,12 @@ int matter_zigbee_coexistence_run(const struct matter_zigbee_coexistence_callbac
  *   that follows a prior Matter commissioning (i.e. the device already has
  *   a fabric), because BLE advertising will not restart and the normal
  *   @c kCHIPoBLEAdvertisingChange signal will never fire.
+ *
+ * When @kconfig{CONFIG_CHIP_DFU_OVER_BT_SMP} and
+ * @kconfig{CONFIG_MATTER_ZIGBEE_COEXISTENCE_DFU_SMP_BUTTON_HANDLER} are
+ * enabled, also registers a supplemental Button-1 handler so DFU over SMP advertising can be started
+ * while the active protocol is Zigbee and a Matter fabric is already stored
+ * (the default NCS Matter board handler only starts SMP when Thread is up).
  */
 void matter_zigbee_coexistence_on_server_started(void);
 

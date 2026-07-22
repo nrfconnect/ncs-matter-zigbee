@@ -19,6 +19,13 @@
 #include <app/matter_event_handler.h>
 #include <app/server/Server.h>
 
+#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_DFU_SMP_BUTTON_HANDLER
+#include <app/task_executor.h>
+#include <dfu/smp/dfu_over_smp.h>
+
+#include <dk_buttons_and_leds.h>
+#endif
+
 #include <net/nrf_802154_callbacks_dispatcher.h>
 
 extern "C" {
@@ -206,6 +213,55 @@ void switch_to_zigbee_radio(void)
 	sys_reboot(SYS_REBOOT_COLD);
 }
 
+#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_DFU_SMP_BUTTON_HANDLER
+/**
+ * Supplement the NCS Matter board Button-1 handler when Zigbee owns the active
+ * protocol but a Matter fabric is already stored.
+ *
+ * Board::StartBLEAdvertisementHandler() only calls DFUOverSMP::StartServer()
+ * when DeviceState::DeviceProvisioned (Thread up). After a protocol switch
+ * back to Zigbee, Thread is disabled so the board falls through to
+ * StartBLEAdvertisement(), which returns immediately when FabricCount > 0.
+ */
+void StartSmpDfuWhenZigbeeCommissioned()
+{
+	if (!protocol_is_zigbee_active()) {
+		return;
+	}
+
+	if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0) {
+		return;
+	}
+
+	Nrf::GetDFUOverSMP().StartServer();
+}
+
+void SmpDfuButtonHandler(uint32_t button_state, uint32_t has_changed)
+{
+	if (!(has_changed & DK_BTN1_MSK) || !(button_state & DK_BTN1_MSK)) {
+		return;
+	}
+
+	Nrf::PostTask([] { StartSmpDfuWhenZigbeeCommissioned(); });
+}
+
+void RegisterSmpDfuButtonHandlerOnce()
+{
+	static bool registered;
+
+	if (registered) {
+		return;
+	}
+
+	static struct button_handler handler = {
+		.cb = SmpDfuButtonHandler,
+	};
+
+	dk_button_handler_add(&handler);
+	registered = true;
+}
+#endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE_DFU_SMP_BUTTON_HANDLER */
+
 void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg)
 {
 	ARG_UNUSED(arg);
@@ -309,6 +365,10 @@ extern "C" void matter_zigbee_coexistence_on_server_started(void)
 	}
 #else
 	matter_board_init_signal();
+#endif
+
+#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_DFU_SMP_BUTTON_HANDLER
+	RegisterSmpDfuButtonHandlerOnce();
 #endif
 }
 

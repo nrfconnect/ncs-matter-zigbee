@@ -64,6 +64,20 @@ config MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS
 	  When the timer expires, the coexistence runtime attempts to switch
 	  to the other protocol unless pairing or commissioning is in progress.
 
+config MATTER_ZIGBEE_COEXISTENCE_DFU_SMP_BUTTON_HANDLER
+	bool "Supplement Button 1 for DFU over SMP while Zigbee is active"
+	default y
+	depends on CHIP_DFU_OVER_BT_SMP
+	help
+	  Register an extra DK Button 1 handler when Matter server init
+	  completes. After a protocol switch back to Zigbee, the default NCS
+	  Matter board handler does not start SMP BLE advertising because
+	  Thread is disabled and a stored fabric blocks commissioning
+	  advertising. The supplemental handler calls DFUOverSMP::StartServer()
+	  on Button 1 press when the active protocol is Zigbee and at least one
+	  Matter fabric exists. Applies to combined light_switch and light_bulb
+	  samples without per-sample changes.
+
 config MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD_STACK_SIZE
 	int "Zigbee worker thread stack size (bytes)"
 	default 2048
