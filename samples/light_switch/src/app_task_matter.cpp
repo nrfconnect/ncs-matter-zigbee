@@ -62,6 +62,7 @@ void AppTask::TimerEventHandler(const Timer &timerType)
 	switch (timerType) {
 	case Timer::DimmerTrigger:
 		LOG_INF("Dimming started...");
+		LOG_INF("TEST...");
 		sWasDimmerTriggered = true;
 		LightSwitch::GetInstance().InitiateActionSwitch(LightSwitch::Action::On);
 		Instance().StartTimer(Timer::Dimmer, kDimmerInterval);
