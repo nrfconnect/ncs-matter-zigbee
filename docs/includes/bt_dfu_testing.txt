@@ -8,6 +8,10 @@ To test DFU over Bluetooth LE SMP, complete the following steps:
 
    * If the device is not commissioned to a Matter fabric, this starts both Matter commissioning advertising and the SMP server.
    * If the device is already commissioned, this re-enables only the SMP server for firmware transfer.
+     Firmware transfer over SMP works with both Matter and Zigbee.
+
+   On the :ref:`matter_zigbee_light_switch_sample`, **Button 0** also controls the bound light bulb while Zigbee is the active protocol.
+   For SMP-only testing on a commissioned device, use the :ref:`matter_zigbee_light_bulb_sample` sample or change the light switch to Matter first.
 
    **LED 0** blinks while Bluetooth LE advertising for SMP is active.
    The advertised device name is |bt device name|, set by the ``CONFIG_BT_DEVICE_NAME`` Kconfig option in the :file:`prj.conf` file.

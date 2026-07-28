@@ -6,3 +6,4 @@
 
 rsource "matter_zigbee_coexistence/Kconfig"
 rsource "matter_zigbee_protocol_state/Kconfig"
+rsource "matter_zigbee_smp_dfu/Kconfig"
