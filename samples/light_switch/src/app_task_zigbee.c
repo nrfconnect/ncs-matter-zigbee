@@ -12,6 +12,8 @@
 
 #include "app_task_zigbee.h"
 
+#include "app_ui_config.h"
+
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_protocol_state.h>
 #include <matter_zigbee_ui.h>
@@ -74,27 +76,14 @@
  * for all network devices before running other samples.
  */
 #define ERASE_PERSISTENT_CONFIG ZB_FALSE
-/* LED indicating that light witch found a light bulb to control. */
-#define BULB_FOUND_LED DK_LED3
-/* Button ID used to toggle the light bulb on/off state. */
-#define BUTTON_TOGGLE DK_BTN3_MSK
-/* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
-#define DIMM_STEP 15
-/* Button ID used to enable sleepy behavior (sampled once at boot). */
-#define BUTTON_SLEEPY DK_BTN3_MSK
 
-#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-/* Short press starts Touchlink. */
-#define BUTTON_TOUCHLINK DK_BTN2_MSK
-#endif
+/* Dim step size - increases/decreases current level (range 0x000 - 0xfe). */
+#define DIMM_STEP 15
 
 /* Transition time for a single step operation in 0.1 sec units.
  * 0xFFFF - immediate change.
  */
 #define DIMM_TRANSACTION_TIME 2
-
-/* Time after which a held toggle button triggers dim-up steps. */
-#define BUTTON_LONG_POLL_TMO K_MSEC(500)
 
 #if !defined ZB_ED_ROLE
 #error Define ZB_ED_ROLE to compile light switch (End Device) source code.
@@ -266,7 +255,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 		return;
 	}
 #elif defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
+	if ((has_changed & APP_UI_BUTTON_ZIGBEE_TOUCHLINK) && (button_state & APP_UI_BUTTON_ZIGBEE_TOUCHLINK)) {
 		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
 		return;
 	}
@@ -281,7 +270,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	}
 
 	switch (has_changed) {
-	case BUTTON_TOGGLE:
+	case APP_UI_BUTTON_LIGHT_TOGGLE:
 		LOG_DBG("TOGGLE - button changed");
 		cmd_id = ZB_ZCL_CMD_ON_OFF_TOGGLE_ID;
 		break;
@@ -307,14 +296,14 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	}
 
 	switch (button_state) {
-	case BUTTON_TOGGLE:
+	case APP_UI_BUTTON_LIGHT_TOGGLE:
 		LOG_DBG("Button pressed");
 		buttons_ctx.state = button_state;
 
 		/* Alarm can be scheduled only once. Next alarm only resets
 		 * counting.
 		 */
-		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO, K_NO_WAIT);
+		k_timer_start(&buttons_ctx.alarm, APP_UI_BUTTON_ZIGBEE_LONG_PRESS_TIMEOUT, K_NO_WAIT);
 		break;
 	case 0:
 		LOG_DBG("Button released");
@@ -471,7 +460,7 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
 		LOG_INF("Found bulb addr: %d ep: %d", bulb_ctx.short_addr, bulb_ctx.endpoint);
 
 		k_timer_stop(&bulb_ctx.find_alarm);
-		led_set_on(BULB_FOUND_LED);
+		led_set_on(APP_UI_LED_ZIGBEE_BULB_FOUND);
 	} else if (bulb_ctx.short_addr != 0xFFFF) {
 		LOG_DBG("Match descriptor response ignored (bulb already selected)");
 	} else if ((resp->status != ZB_ZDP_STATUS_SUCCESS) || (resp->match_len == 0)) {
@@ -556,7 +545,7 @@ static void light_switch_button_handler(struct k_timer *timer)
 			LOG_ERR("Failed to schedule buffer allocation: %d", zb_err_code);
 		}
 
-		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO, K_NO_WAIT);
+		k_timer_start(&buttons_ctx.alarm, APP_UI_BUTTON_ZIGBEE_LONG_PRESS_TIMEOUT, K_NO_WAIT);
 	} else {
 		atomic_set(&buttons_ctx.long_poll, ZB_FALSE);
 	}
@@ -847,7 +836,7 @@ int ZigbeeStart(void)
 #elif defined(CONFIG_CHIP)
 	bool enable_sleepy = false;
 #else
-	bool enable_sleepy = (dk_get_buttons() & BUTTON_SLEEPY) ? true : false;
+	bool enable_sleepy = (dk_get_buttons() & APP_UI_BUTTON_ZIGBEE_SLEEPY) ? true : false;
 #endif
 
 	if (enable_sleepy) {

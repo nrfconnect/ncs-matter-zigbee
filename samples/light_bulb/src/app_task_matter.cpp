@@ -15,6 +15,10 @@
 
 #include <matter_zigbee_ui_matter_identify.h>
 
+#include "app_ui_config.h"
+
+#include <zephyr/logging/log.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
@@ -28,8 +32,6 @@
 
 #include <matter_zigbee_ui.h>
 #include <matter_zigbee_ui_config.h>
-
-#include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -46,7 +48,7 @@ constexpr uint8_t kDefaultMaxLevel = 254;
 matter_zigbee_ui::MatterIdentifyCluster sIdentifyCluster(kLightEndpointId, true);
 
 #if defined(CONFIG_PWM)
-const struct pwm_dt_spec sLightPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
+const struct pwm_dt_spec sLightPwmDevice = PWM_DT_SPEC_GET(APP_UI_PWM_LIGHT_NODE);
 #endif
 
 /* Define a custom attribute persister which makes actual write of the
@@ -67,7 +69,6 @@ DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttribut
 								 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
 								 System::Clock::Milliseconds32(5000));
 
-#define APPLICATION_BUTTON_MASK DK_BTN3_MSK
 } /* namespace */
 
 void AppTask::LightingActionEventHandler(const LightingEvent &event)
@@ -84,13 +85,13 @@ void AppTask::LightingActionEventHandler(const LightingEvent &event)
 		LOG_INF("An action could not be initiated.");
 	}
 #else
-	matter_zigbee_ui_led_toggle(MATTER_ZIGBEE_UI_LED_ZIGBEE);
+	matter_zigbee_ui_led_toggle(APP_UI_LED_MAIN_LIGHT);
 #endif
 }
 
 void AppTask::ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged)
 {
-	if ((APPLICATION_BUTTON_MASK & hasChanged) & state) {
+	if ((APP_UI_BUTTON_LIGHT_TOGGLE & hasChanged) & state) {
 		Nrf::PostTask([] {
 			LightingEvent event;
 			event.Actor = LightingActor::Button;
@@ -136,7 +137,7 @@ void AppTask::UpdateClusterState()
 			Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, mPWMDevice.IsTurnedOn());
 #else
 		Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(
-			kLightEndpointId, matter_zigbee_ui_led_get(MATTER_ZIGBEE_UI_LED_ZIGBEE));
+			kLightEndpointId, matter_zigbee_ui_led_get(APP_UI_LED_MAIN_LIGHT));
 #endif
 		if (status != Protocols::InteractionModel::Status::Success) {
 			LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
@@ -147,7 +148,7 @@ void AppTask::UpdateClusterState()
 		status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, mPWMDevice.GetLevel());
 #else
 		/* write the current level */
-		if (matter_zigbee_ui_led_get(MATTER_ZIGBEE_UI_LED_ZIGBEE)) {
+		if (matter_zigbee_ui_led_get(APP_UI_LED_MAIN_LIGHT)) {
 			status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, 100);
 		} else {
 			status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, 0);
