@@ -26,10 +26,6 @@
 #include <matter_zigbee_coexistence.h>
 #endif
 
-#if defined(CONFIG_MATTER_ZIGBEE_SMP_DFU)
-#include <matter_zigbee_smp_dfu.h>
-#endif
-
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -210,10 +206,6 @@ CHIP_ERROR AppTask::Init()
 // 		LOG_ERR("User interface initialization failed.");
 // 		return CHIP_ERROR_INCORRECT_STATE;
 // 	}
-
-// #if defined(CONFIG_MATTER_ZIGBEE_SMP_DFU)
-// 	matter_zigbee_smp_dfu_init();
-// #endif
 
 // 	/* Register Matter event handler that controls the connectivity status LED
 // 	 * based on the captured Matter network state. */
