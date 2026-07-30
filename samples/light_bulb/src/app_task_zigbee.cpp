@@ -17,6 +17,7 @@
 #endif
 
 #include <matter_zigbee_ui_config.h>
+#include <matter_zigbee_ui.h>
 
 #include <soc.h>
 #include <zephyr/device.h>
@@ -343,7 +344,7 @@ static void toggle_identify_led(zb_bufid_t bufid)
 {
 	static int blink_status;
 
-	dk_set_led(MATTER_ZIGBEE_UI_LED_IDENTIFY, (++blink_status) % 2);
+	matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, ((++blink_status) % 2) != 0);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -361,7 +362,7 @@ static void identify_cb(zb_bufid_t bufid)
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
 
-		dk_set_led_off(MATTER_ZIGBEE_UI_LED_IDENTIFY);
+		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, false);
 	}
 }
 
@@ -534,7 +535,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 #endif
 
 	/* Update network status LED. */
-	zigbee_led_status_update(bufid, MATTER_ZIGBEE_UI_LED_ZIGBEE);
+	matter_zigbee_ui_zigbee_network_led_update(bufid);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
 	zigbee_touchlink_target_signal_handler(bufid);

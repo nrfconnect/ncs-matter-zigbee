@@ -26,6 +26,10 @@
  *
  * SMP DFU requires @kconfig{CONFIG_MATTER_ZIGBEE_UI_SMP_DFU}.
  *
+ * @ref MATTER_ZIGBEE_UI_LED_MATTER and @ref MATTER_ZIGBEE_UI_LED_ZIGBEE show
+ * connectivity for the active protocol. Both are off when the other protocol
+ * is selected. @ref matter_zigbee_ui_register() wires the handlers.
+ *
  * LED indices match @c DK_LED1 … (@ref matter_zigbee_ui_config.h).
  * @ref matter_zigbee_ui_register() calls @c dk_leds_init().
  */
@@ -98,6 +102,23 @@ void matter_zigbee_ui_led_blink(uint8_t led, uint32_t on_ms, uint32_t off_ms);
 
 /** @brief Stop blinking a DK LED and leave it in the current on/off state. */
 void matter_zigbee_ui_led_blink_stop(uint8_t led);
+
+/** @brief Update @ref MATTER_ZIGBEE_UI_LED_ZIGBEE from a ZBOSS application signal.
+ *
+ * Call from the sample @c zboss_signal_handler(). The LED is off when Matter is
+ * active, solid on when Zigbee is active and joined, and blinks while Zigbee is
+ * active but not joined.
+ *
+ * @param bufid ZBOSS application signal buffer id (@c zb_bufid_t).
+ */
+void matter_zigbee_ui_zigbee_network_led_update(uint8_t bufid);
+
+/** @brief Re-apply both protocol connectivity LEDs from persisted protocol state.
+ *
+ * Call after a protocol switch so the inactive protocol LED is turned off
+ * immediately.
+ */
+void matter_zigbee_ui_protocol_leds_refresh(void);
 
 #ifdef __cplusplus
 }

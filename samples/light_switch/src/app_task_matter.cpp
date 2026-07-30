@@ -154,15 +154,6 @@ CHIP_ERROR AppTask::Init()
 	k_timer_init(&sDimmerPressKeyTimer, AppTask::UserTimerTimeoutCallback, nullptr);
 	k_timer_init(&sDimmerTimer, AppTask::UserTimerTimeoutCallback, nullptr);
 
-// 	if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
-// 		LOG_ERR("User interface initialization failed.");
-// 		return CHIP_ERROR_INCORRECT_STATE;
-// 	}
-
-// 	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network
-// 	 * state. */
-// 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
-
 	ReturnErrorOnFailure(sIdentifyCluster.Init());
 
 	ReturnErrorOnFailure(Nrf::Matter::StartServer());

@@ -120,15 +120,15 @@ static inline void led_set_off(uint32_t led)
 #else
 static inline void led_set(uint32_t led, uint32_t val)
 {
-	dk_set_led(led, val);
+	matter_zigbee_ui_led_set(led, val != 0U);
 }
 static inline void led_set_on(uint32_t led)
 {
-	dk_set_led_on(led);
+	matter_zigbee_ui_led_set(led, true);
 }
 static inline void led_set_off(uint32_t led)
 {
-	dk_set_led_off(led);
+	matter_zigbee_ui_led_set(led, false);
 }
 #endif
 
@@ -629,7 +629,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
 
 	/* Update network status LED. */
-	zigbee_led_status_update(bufid, MATTER_ZIGBEE_UI_LED_ZIGBEE);
+	matter_zigbee_ui_zigbee_network_led_update(bufid);
 
 #ifdef CONFIG_ZIGBEE_FOTA
 	/* Pass signal to the OTA client implementation. */
