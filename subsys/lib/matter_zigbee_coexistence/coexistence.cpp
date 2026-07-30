@@ -6,6 +6,7 @@
 
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_protocol_state.h>
+#include <matter_zigbee_ui.h>
 #include <zigbee/zigbee_app_utils.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -192,6 +193,7 @@ void switch_to_thread_radio(void)
 
 	protocol_state_set(PROTOCOL_MATTER);
 	LOG_INF("Protocol switched to Matter");
+	matter_zigbee_ui_protocol_leds_refresh();
 
 	int ret = nrf_802154_callbacks_dispatcher_switch("openthread");
 	__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
