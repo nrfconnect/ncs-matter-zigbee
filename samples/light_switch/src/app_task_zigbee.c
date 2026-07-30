@@ -41,11 +41,6 @@
 #include <zephyr/dfu/mcuboot.h>
 #endif
 
-#if CONFIG_ZIGBEE_FOTA
-/* LED indicating OTA Client Activity. */
-#define OTA_ACTIVITY_LED DK_LED2
-#endif /* CONFIG_ZIGBEE_FOTA */
-
 #ifdef CONFIG_ZIGBEE_BT_DFU
 #include <zigbee/zigbee_bt_dfu.h>
 #endif
@@ -53,8 +48,6 @@
 #if CONFIG_BT_NUS
 #include "nus_cmd.h"
 
-/* LED which indicates that Central is connected. */
-#define NUS_STATUS_LED DK_LED1
 /* UART command that will turn on found light bulb(s). */
 #define COMMAND_ON "n"
 /**< UART command that will turn off found light bulb(s). */
@@ -82,7 +75,7 @@
  */
 #define ERASE_PERSISTENT_CONFIG ZB_FALSE
 /* LED indicating that light witch found a light bulb to control. */
-#define BULB_FOUND_LED DK_LED4
+#define BULB_FOUND_LED DK_LED3
 /* Button ID used to toggle the light bulb on/off state. */
 #define BUTTON_TOGGLE DK_BTN3_MSK
 /* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
@@ -588,10 +581,6 @@ static void confirm_image(void)
 static void ota_evt_handler(const struct zigbee_fota_evt *evt)
 {
 	switch (evt->id) {
-	case ZIGBEE_FOTA_EVT_PROGRESS:
-		led_set(OTA_ACTIVITY_LED, evt->dl.progress % 2);
-		break;
-
 	case ZIGBEE_FOTA_EVT_FINISHED:
 		LOG_INF("Reboot application.");
 		/* Power on unused sections of RAM to allow MCUboot to use it. */
@@ -738,13 +727,11 @@ static void decrease_cmd(struct k_work *item)
 static void on_nus_connect(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	led_set_on(NUS_STATUS_LED);
 }
 
 static void on_nus_disconnect(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	led_set_off(NUS_STATUS_LED);
 }
 
 static struct nus_entry commands[] = {

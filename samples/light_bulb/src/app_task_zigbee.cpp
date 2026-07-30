@@ -58,9 +58,6 @@ extern "C" {
 #include <zephyr/sys/reboot.h>
 #endif
 
-#define RUN_STATUS_LED DK_LED1
-#define RUN_LED_BLINK_INTERVAL 1000
-
 /* Device endpoint, used to receive light controlling commands. */
 #define DIMMABLE_LIGHT_ENDPOINT 10
 
@@ -101,10 +98,6 @@ extern "C" {
 
 /* LED imitating dimmable light bulb - define for informational purposes only. */
 #define BULB_LED DK_LED3
-
-#if CONFIG_ZIGBEE_FOTA
-#define OTA_ACTIVITY_LED DK_LED2
-#endif
 
 /* Use onboard LED 2 (DK_LED3) as the light bulb.
  * The board overlay exposes PWM for this LED at node label "pwm_led3" in /pwmleds.
@@ -440,10 +433,6 @@ static void confirm_image(void)
 static void ota_evt_handler(const struct zigbee_fota_evt *evt)
 {
 	switch (evt->id) {
-	case ZIGBEE_FOTA_EVT_PROGRESS:
-		dk_set_led(OTA_ACTIVITY_LED, evt->dl.progress % 2);
-		break;
-
 	case ZIGBEE_FOTA_EVT_FINISHED:
 		LOG_INF("Reboot application.");
 		if (IS_ENABLED(CONFIG_RAM_POWER_DOWN_LIBRARY)) {
@@ -567,7 +556,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 extern "C" int ZigbeeStart(void)
 {
-	int blink_status = 0;
 #ifdef CONFIG_ZIGBEE_SCENES
 	int err;
 #endif
@@ -636,8 +624,7 @@ extern "C" int ZigbeeStart(void)
 	LOG_INF("Zigbee R23 Light Bulb example started");
 
 	while (1) {
-		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+		k_sleep(K_FOREVER);
 	}
 
 	return 0;
