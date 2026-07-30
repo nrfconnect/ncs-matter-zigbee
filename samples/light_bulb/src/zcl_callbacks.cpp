@@ -8,6 +8,9 @@
 
 #include "app_task_matter.h"
 
+#include <matter_zigbee_ui.h>
+#include <matter_zigbee_ui_config.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -34,7 +37,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath &a
 									   Nrf::PWMDevice::OFF_ACTION,
 								  static_cast<int32_t>(LightingActor::Remote), value);
 #else
-		Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(*value);
+		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_ZIGBEE, *value);
 #endif
 
 	} else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id) {
@@ -84,7 +87,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 										Nrf::PWMDevice::OFF_ACTION,
 								  static_cast<int32_t>(LightingActor::Remote), nullptr);
 #else
-		Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(storedValue);
+		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_ZIGBEE, storedValue);
 #endif
 	} else {
 		ChipLogError(Zcl, "Failed to read stored OnOff value: 0x%x", to_underlying(status));

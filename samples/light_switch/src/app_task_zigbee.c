@@ -15,6 +15,7 @@
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_protocol_state.h>
 #include <matter_zigbee_ui.h>
+#include <matter_zigbee_ui_config.h>
 
 #include <dk_buttons_and_leds.h>
 #include <ram_pwrdn.h>
@@ -80,10 +81,6 @@
  * for all network devices before running other samples.
  */
 #define ERASE_PERSISTENT_CONFIG ZB_FALSE
-/* LED indicating that light switch successfully joind Zigbee network. */
-#define ZIGBEE_NETWORK_STATE_LED DK_LED3
-/* LED used for device identification. */
-#define IDENTIFY_LED ZIGBEE_NETWORK_STATE_LED
 /* LED indicating that light witch found a light bulb to control. */
 #define BULB_FOUND_LED DK_LED4
 /* Button ID used to toggle the light bulb on/off state. */
@@ -97,12 +94,6 @@
 /* Short press starts Touchlink. */
 #define BUTTON_TOUCHLINK DK_BTN2_MSK
 #endif
-
-/* Button to start Factory Reset */
-#define FACTORY_RESET_BUTTON DK_BTN4_MSK
-
-/* Button used to enter the Identify mode. */
-#define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
 
 /* Transition time for a single step operation in 0.1 sec units.
  * 0xFFFF - immediate change.
@@ -301,8 +292,8 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 		LOG_DBG("TOGGLE - button changed");
 		cmd_id = ZB_ZCL_CMD_ON_OFF_TOGGLE_ID;
 		break;
-	case IDENTIFY_MODE_BUTTON:
-		if (IDENTIFY_MODE_BUTTON & button_state) {
+	case MATTER_ZIGBEE_UI_BUTTON_IDENTIFY:
+		if (MATTER_ZIGBEE_UI_BUTTON_IDENTIFY & button_state) {
 			/* Button changed its state to pressed */
 		} else {
 			/* Button changed its state to released */
@@ -404,7 +395,7 @@ static void toggle_identify_led(zb_bufid_t bufid)
 {
 	static int blink_status;
 
-	led_set(IDENTIFY_LED, (++blink_status) % 2);
+	led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, (++blink_status) % 2);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -424,12 +415,7 @@ static void identify_cb(zb_bufid_t bufid)
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
 
-		/* Update network status/idenitfication LED. */
-		if (ZB_JOINED()) {
-			led_set_on(ZIGBEE_NETWORK_STATE_LED);
-		} else {
-			led_set_off(ZIGBEE_NETWORK_STATE_LED);
-		}
+		led_set_off(MATTER_ZIGBEE_UI_LED_IDENTIFY);
 	}
 }
 
@@ -654,7 +640,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
 
 	/* Update network status LED. */
-	zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
+	zigbee_led_status_update(bufid, MATTER_ZIGBEE_UI_LED_ZIGBEE);
 
 #ifdef CONFIG_ZIGBEE_FOTA
 	/* Pass signal to the OTA client implementation. */
@@ -856,11 +842,6 @@ void set_tx_power(void)
 int ZigbeeStart(void)
 {
 	LOG_INF("Starting Zigbee R23 Light Switch example");
-
-#ifndef CONFIG_CHIP
-	configure_gpio();
-	register_factory_reset_button(FACTORY_RESET_BUTTON);
-#endif
 
 	alarm_timers_init();
 

@@ -25,6 +25,9 @@
  * equally between the initial hold and cancel window).
  *
  * SMP DFU requires @kconfig{CONFIG_MATTER_ZIGBEE_UI_SMP_DFU}.
+ *
+ * LED indices match @c DK_LED1 … (@ref matter_zigbee_ui_config.h).
+ * @ref matter_zigbee_ui_register() calls @c dk_leds_init().
  */
 
 #include <matter_zigbee_protocol_state.h>
@@ -80,6 +83,21 @@ bool matter_zigbee_ui_consume_protocol_switch_short_release(void);
  * Safe to call more than once; only the first successful call has effect.
  */
 void matter_zigbee_ui_register(void);
+
+/** @brief Set a DK LED on or off (@c DK_LED1 = 0). */
+void matter_zigbee_ui_led_set(uint8_t led, bool on);
+
+/** @brief Return the last on/off state set through @ref matter_zigbee_ui_led_set(). */
+bool matter_zigbee_ui_led_get(uint8_t led);
+
+/** @brief Toggle a DK LED. */
+void matter_zigbee_ui_led_toggle(uint8_t led);
+
+/** @brief Blink a DK LED with independent on/off periods (milliseconds). */
+void matter_zigbee_ui_led_blink(uint8_t led, uint32_t on_ms, uint32_t off_ms);
+
+/** @brief Stop blinking a DK LED and leave it in the current on/off state. */
+void matter_zigbee_ui_led_blink_stop(uint8_t led);
 
 #ifdef __cplusplus
 }

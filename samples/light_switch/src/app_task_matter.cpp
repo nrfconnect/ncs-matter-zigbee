@@ -10,8 +10,8 @@
 
 #include "app/matter_init.h"
 #include "app/task_executor.h"
-#include "board/board.h"
-#include "clusters/identify.h"
+
+#include <matter_zigbee_ui_matter_identify.h>
 
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -35,7 +35,7 @@ constexpr EndpointId kLightEndpointId = 1;
 k_timer sDimmerPressKeyTimer;
 k_timer sDimmerTimer;
 
-Nrf::Matter::IdentifyCluster sIdentifyCluster(kLightEndpointId);
+matter_zigbee_ui::MatterIdentifyCluster sIdentifyCluster(kLightEndpointId);
 
 bool sWasDimmerTriggered = false;
 

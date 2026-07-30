@@ -13,7 +13,7 @@
 #include "pwm/pwm_device.h"
 #endif
 
-#include "clusters/identify.h"
+#include <matter_zigbee_ui_matter_identify.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
@@ -25,6 +25,9 @@
 #if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE)
 #include <matter_zigbee_coexistence.h>
 #endif
+
+#include <matter_zigbee_ui.h>
+#include <matter_zigbee_ui_config.h>
 
 #include <zephyr/logging/log.h>
 
@@ -40,12 +43,7 @@ constexpr EndpointId kLightEndpointId = 1;
 constexpr uint8_t kDefaultMinLevel = 0;
 constexpr uint8_t kDefaultMaxLevel = 254;
 
-Nrf::Matter::IdentifyCluster sIdentifyCluster(kLightEndpointId, true, []() {
-	Nrf::PostTask([] { Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(false); });
-#if defined(CONFIG_PWM)
-	Nrf::PostTask([] { AppTask::Instance().GetPWMDevice().ApplyLevel(); });
-#endif
-});
+matter_zigbee_ui::MatterIdentifyCluster sIdentifyCluster(kLightEndpointId, true);
 
 #if defined(CONFIG_PWM)
 const struct pwm_dt_spec sLightPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
@@ -86,7 +84,7 @@ void AppTask::LightingActionEventHandler(const LightingEvent &event)
 		LOG_INF("An action could not be initiated.");
 	}
 #else
-	Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(!Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState());
+	matter_zigbee_ui_led_toggle(MATTER_ZIGBEE_UI_LED_ZIGBEE);
 #endif
 }
 
@@ -138,7 +136,7 @@ void AppTask::UpdateClusterState()
 			Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, mPWMDevice.IsTurnedOn());
 #else
 		Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(
-			kLightEndpointId, Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState());
+			kLightEndpointId, matter_zigbee_ui_led_get(MATTER_ZIGBEE_UI_LED_ZIGBEE));
 #endif
 		if (status != Protocols::InteractionModel::Status::Success) {
 			LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
@@ -149,7 +147,7 @@ void AppTask::UpdateClusterState()
 		status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, mPWMDevice.GetLevel());
 #else
 		/* write the current level */
-		if (Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).GetState()) {
+		if (matter_zigbee_ui_led_get(MATTER_ZIGBEE_UI_LED_ZIGBEE)) {
 			status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, 100);
 		} else {
 			status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, 0);
