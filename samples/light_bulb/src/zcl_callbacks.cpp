@@ -8,6 +8,8 @@
 
 #include "app_task_matter.h"
 
+#include "app_ui_config.h"
+
 #include <matter_zigbee_ui.h>
 #include <matter_zigbee_ui_config.h>
 
@@ -37,7 +39,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath &a
 									   Nrf::PWMDevice::OFF_ACTION,
 								  static_cast<int32_t>(LightingActor::Remote), value);
 #else
-		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_ZIGBEE, *value);
+		matter_zigbee_ui_led_set(APP_UI_LED_MAIN_LIGHT, *value);
 #endif
 
 	} else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id) {
@@ -87,7 +89,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 										Nrf::PWMDevice::OFF_ACTION,
 								  static_cast<int32_t>(LightingActor::Remote), nullptr);
 #else
-		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_ZIGBEE, storedValue);
+		matter_zigbee_ui_led_set(APP_UI_LED_MAIN_LIGHT, storedValue);
 #endif
 	} else {
 		ChipLogError(Zcl, "Failed to read stored OnOff value: 0x%x", to_underlying(status));

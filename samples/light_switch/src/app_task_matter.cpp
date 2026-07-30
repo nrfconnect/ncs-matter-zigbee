@@ -6,6 +6,8 @@
 
 #include "app_task_matter.h"
 
+#include "app_ui_config.h"
+
 #include "light_switch.h"
 
 #include "app/matter_init.h"
@@ -38,12 +40,6 @@ k_timer sDimmerTimer;
 matter_zigbee_ui::MatterIdentifyCluster sIdentifyCluster(kLightEndpointId);
 
 bool sWasDimmerTriggered = false;
-
-#define APPLICATION_BUTTON_MASK DK_BTN3_MSK
-
-#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-#define UAT_BUTTON_MASK DK_BTN2_MSK
-#endif
 } /* namespace */
 
 void AppTask::DimmerTriggerEventHandler()
@@ -77,13 +73,13 @@ void AppTask::TimerEventHandler(const Timer &timerType)
 
 void AppTask::ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged)
 {
-	if ((APPLICATION_BUTTON_MASK & state & hasChanged)) {
+	if ((APP_UI_BUTTON_LIGHT_TOGGLE & state & hasChanged)) {
 		LOG_INF("Button has been pressed, keep in this state for at least 500 ms to change light sensitivity of bound lighting devices.");
 		Instance().StartTimer(Timer::DimmerTrigger, kDimmerTriggeredTimeout);
-	} else if ((APPLICATION_BUTTON_MASK & hasChanged)) {
+	} else if ((APP_UI_BUTTON_LIGHT_TOGGLE & hasChanged)) {
 		Nrf::PostTask([] { DimmerTriggerEventHandler(); });
 #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-	} else if ((UAT_BUTTON_MASK & state & hasChanged)) {
+	} else if ((APP_UI_BUTTON_MATTER_ICD_UAT & state & hasChanged)) {
 		LOG_INF("ICD UserActiveMode has been triggered.");
 		Server::GetInstance().GetICDManager().OnNetworkActivity();
 #endif
