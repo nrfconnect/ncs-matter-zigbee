@@ -28,6 +28,15 @@ config MATTER_ZIGBEE_UI_FACTORY_RESET_PRESS_TIME_SECONDS
 	  cancel window duration (keeping the button pressed through it confirms
 	  the reset).
 
+config MATTER_ZIGBEE_UI_SMP_DFU
+	bool "SMP DFU button in common UI"
+	depends on CHIP_DFU_OVER_BT_SMP
+	depends on NCS_SAMPLE_MATTER_CUSTOM_BLUETOOTH_ADVERTISING
+	default y
+	help
+	  Short press on MATTER_ZIGBEE_UI_BUTTON_SMP_DFU starts SMP DFU
+	  advertising.
+
 module = MATTER_ZIGBEE_UI
 module-str = Matter/Zigbee UI
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

@@ -9,6 +9,9 @@
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_ui_config.h>
 #include <matter_zigbee_ui_matter_factory_reset.h>
+#if defined(CONFIG_MATTER_ZIGBEE_UI_SMP_DFU)
+#include <matter_zigbee_ui_smp_dfu.h>
+#endif
 
 #include <dk_buttons_and_leds.h>
 #include <zigbee/zigbee_app_utils.h>
@@ -52,6 +55,10 @@ static void ui_button_handler(uint32_t button_state, uint32_t has_changed)
 		button_state, has_changed, MATTER_ZIGBEE_UI_BUTTON_PROTOCOL_SWITCH);
 #else
 	s_protocol_switch_short_release = false;
+#endif
+
+#if defined(CONFIG_MATTER_ZIGBEE_UI_SMP_DFU)
+	matter_zigbee_ui_smp_dfu_button(button_state, has_changed);
 #endif
 
 	ui_handle_factory_reset(button_state, has_changed);
