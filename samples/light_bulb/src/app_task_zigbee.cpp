@@ -109,11 +109,6 @@ extern "C" {
 #define OTA_ACTIVITY_LED DK_LED2
 #endif
 
-#if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
-/* Long-press to switch active protocol. */
-#define PROTOCOL_SWITCH_BUTTON DK_BTN3_MSK
-#endif
-
 /* Button used to enter the Bulb into the Identify mode. */
 #define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
 
@@ -235,16 +230,6 @@ static void start_identifying(zb_bufid_t bufid)
  */
 static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 {
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH
-	(void)matter_zigbee_coexistence_process_switch_button(button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
-#endif
-
-	if (!protocol_is_zigbee_active()) {
-		return;
-	}
-#endif
-
 	if (IDENTIFY_MODE_BUTTON & has_changed) {
 		if (IDENTIFY_MODE_BUTTON & button_state) {
 			/* Button changed its state to pressed */
@@ -261,23 +246,12 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 			}
 		}
 	}
-
-	check_factory_reset_button(button_state, has_changed);
 }
 
 #ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE
 extern "C" void zb_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	zb_button_handler_impl(button_state, has_changed);
-}
-
-extern "C" void zb_register_button_handler(void)
-{
-	static struct button_handler handler = {
-		.cb = zb_button_handler,
-	};
-
-	dk_button_handler_add(&handler);
 }
 #else
 /**@brief Callback wrapper for button events (Zigbee-only builds). */

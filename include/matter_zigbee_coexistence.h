@@ -50,11 +50,10 @@ struct matter_zigbee_coexistence_callbacks {
 	 *  @kconfig{CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE},
 	 *  otherwise after @ref matter_zigbee_coexistence_on_server_started
 	 *  unblocks the Zigbee worker).
-	 *  Typically used to register a chained Zigbee button handler with
-	 *  the DK buttons library after @c dk_buttons_init() has completed.
-	 *  May be NULL.
+	 *  Typically @ref matter_zigbee_ui_register to initialise DK buttons and
+	 *  chain the common UI handler. May be NULL.
 	 */
-	void (*post_matter_board_init)(void);
+	void (*post_matter_ui_init)(void);
 };
 
 /** @brief Start the coexistence runtime.

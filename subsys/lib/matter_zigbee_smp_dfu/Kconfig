@@ -8,17 +8,12 @@ menuconfig MATTER_ZIGBEE_SMP_DFU
 	bool "SMP DFU button handler for combined Matter + Zigbee samples"
 	depends on MATTER_ZIGBEE_ADD_ON && CHIP_DFU_OVER_BT_SMP
 	depends on NCS_SAMPLE_MATTER_CUSTOM_BLUETOOTH_ADVERTISING
-	default y
+	default n
 	help
-	  Register a Button 0 handler (DK Button 1) that starts SMP BLE
-	  advertising when the device is already commissioned to a Matter
-	  fabric, even if Thread is disabled and the active protocol is Zigbee.
-
-	  This replaces the default handler in the Nordic Matter board module,
-	  which only starts SMP when the device state is DeviceProvisioned
-	  (Thread up). Enable
-	  CONFIG_NCS_SAMPLE_MATTER_CUSTOM_BLUETOOTH_ADVERTISING in the
-	  application to disable that default path.
+	  Deprecated: SMP DFU is handled by the common UI module when
+	  CONFIG_MATTER_ZIGBEE_UI_SMP_DFU is enabled. This standalone option
+	  registers a separate chained button handler and should not be used
+	  together with matter_zigbee_ui.
 
 if MATTER_ZIGBEE_SMP_DFU
 

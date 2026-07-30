@@ -73,7 +73,7 @@ DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttribut
 								 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
 								 System::Clock::Milliseconds32(5000));
 
-#define APPLICATION_BUTTON_MASK DK_BTN2_MSK
+#define APPLICATION_BUTTON_MASK DK_BTN3_MSK
 } /* namespace */
 
 void AppTask::LightingActionEventHandler(const LightingEvent &event)
@@ -206,18 +206,18 @@ CHIP_ERROR AppTask::Init()
 #endif
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(initData));
 
-	if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
-		LOG_ERR("User interface initialization failed.");
-		return CHIP_ERROR_INCORRECT_STATE;
-	}
+// 	if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
+// 		LOG_ERR("User interface initialization failed.");
+// 		return CHIP_ERROR_INCORRECT_STATE;
+// 	}
 
-#if defined(CONFIG_MATTER_ZIGBEE_SMP_DFU)
-	matter_zigbee_smp_dfu_init();
-#endif
+// #if defined(CONFIG_MATTER_ZIGBEE_SMP_DFU)
+// 	matter_zigbee_smp_dfu_init();
+// #endif
 
-	/* Register Matter event handler that controls the connectivity status LED
-	 * based on the captured Matter network state. */
-	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
+// 	/* Register Matter event handler that controls the connectivity status LED
+// 	 * based on the captured Matter network state. */
+// 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
 	ReturnErrorOnFailure(sIdentifyCluster.Init());
 

@@ -1,0 +1,35 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig MATTER_ZIGBEE_UI
+	bool "Common Matter + Zigbee UI for combined samples"
+	depends on MATTER_ZIGBEE_COEXISTENCE
+	depends on DK_LIBRARY
+	default y
+	help
+	  Shared button and LED handling for combined Matter + Zigbee samples.
+	  Samples register optional callbacks from main() and pass
+	  matter_zigbee_ui_register() as the coexistence post_matter_ui_init hook.
+	  That hook calls dk_buttons_init() for the common UI dispatcher.
+
+if MATTER_ZIGBEE_UI
+
+config MATTER_ZIGBEE_UI_FACTORY_RESET_PRESS_TIME_SECONDS
+	int "Matter factory reset button press time (seconds)"
+	default 5
+	range 2 30
+	help
+	  Total time budget for the Matter factory-reset button gesture on
+	  MATTER_ZIGBEE_UI_BUTTON_FACTORY_RESET. Half of this value is the
+	  initial hold before the cancel window opens; the other half is the
+	  cancel window duration (keeping the button pressed through it confirms
+	  the reset).
+
+module = MATTER_ZIGBEE_UI
+module-str = Matter/Zigbee UI
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # MATTER_ZIGBEE_UI

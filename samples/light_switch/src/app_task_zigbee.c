@@ -14,6 +14,7 @@
 
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_protocol_state.h>
+#include <matter_zigbee_ui.h>
 
 #include <dk_buttons_and_leds.h>
 #include <ram_pwrdn.h>
@@ -85,10 +86,8 @@
 #define IDENTIFY_LED ZIGBEE_NETWORK_STATE_LED
 /* LED indicating that light witch found a light bulb to control. */
 #define BULB_FOUND_LED DK_LED4
-/* Button ID used to switch on the light bulb. */
-#define BUTTON_ON DK_BTN1_MSK
-/* Button ID used to switch off the light bulb. */
-#define BUTTON_OFF DK_BTN2_MSK
+/* Button ID used to toggle the light bulb on/off state. */
+#define BUTTON_TOGGLE DK_BTN3_MSK
 /* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
 #define DIMM_STEP 15
 /* Button ID used to enable sleepy behavior (sampled once at boot). */
@@ -96,12 +95,7 @@
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 /* Short press starts Touchlink. */
-#define BUTTON_TOUCHLINK DK_BTN3_MSK
-#endif
-
-#if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
-/* Long press switches protocol in coex builds. */
-#define PROTOCOL_SWITCH_BUTTON DK_BTN3_MSK
+#define BUTTON_TOUCHLINK DK_BTN2_MSK
 #endif
 
 /* Button to start Factory Reset */
@@ -115,9 +109,7 @@
  */
 #define DIMM_TRANSACTION_TIME 2
 
-/* Time after which the button state is checked again to detect button hold,
- * the dimm command is sent again.
- */
+/* Time after which a held toggle button triggers dim-up steps. */
 #define BUTTON_LONG_POLL_TMO K_MSEC(500)
 
 #if !defined ZB_ED_ROLE
@@ -284,17 +276,14 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	zb_uint16_t cmd_id;
 	zb_ret_t zb_err_code;
 
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE
-#if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
-#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-	bool protocol_switch_short_release =
-		matter_zigbee_coexistence_process_switch_button(button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
-#else
-	(void)matter_zigbee_coexistence_process_switch_button(button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
-#endif
-#endif
-
-	if (!protocol_is_zigbee_active()) {
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR) && defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
+	if (matter_zigbee_ui_consume_protocol_switch_short_release()) {
+		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
+		return;
+	}
+#elif defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
+		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
 		return;
 	}
 #endif
@@ -302,35 +291,15 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	/* Inform default signal handler about user input at the device. */
 	user_input_indicate();
 
-	check_factory_reset_button(button_state, has_changed);
-
-#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-#if defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE) && defined(CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH)
-	if (protocol_switch_short_release) {
-		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
-		return;
-	}
-#else
-	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
-		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
-		return;
-	}
-#endif
-#endif
-
 	if (bulb_ctx.short_addr == 0xFFFF) {
 		LOG_DBG("No bulb found yet.");
 		return;
 	}
 
 	switch (has_changed) {
-	case BUTTON_ON:
-		LOG_DBG("ON - button changed");
-		cmd_id = ZB_ZCL_CMD_ON_OFF_ON_ID;
-		break;
-	case BUTTON_OFF:
-		LOG_DBG("OFF - button changed");
-		cmd_id = ZB_ZCL_CMD_ON_OFF_OFF_ID;
+	case BUTTON_TOGGLE:
+		LOG_DBG("TOGGLE - button changed");
+		cmd_id = ZB_ZCL_CMD_ON_OFF_TOGGLE_ID;
 		break;
 	case IDENTIFY_MODE_BUTTON:
 		if (IDENTIFY_MODE_BUTTON & button_state) {
@@ -354,8 +323,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	}
 
 	switch (button_state) {
-	case BUTTON_ON:
-	case BUTTON_OFF:
+	case BUTTON_TOGGLE:
 		LOG_DBG("Button pressed");
 		buttons_ctx.state = button_state;
 
@@ -384,14 +352,6 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 void zb_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	zb_button_handler_impl(button_state, has_changed);
-}
-
-void zb_register_button_handler(void)
-{
-	static struct button_handler handler = {
-		.cb = zb_button_handler,
-	};
-	dk_button_handler_add(&handler);
 }
 #else
 /**@brief Callback wrapper for button events (non-Matter builds). */
@@ -598,7 +558,7 @@ static void find_light_bulb(zb_bufid_t bufid)
 	}
 }
 
-/**@brief Callback for detecting button press duration.
+/**@brief Callback for detecting toggle button hold (dim up while pressed).
  *
  * @param[in]   timer   Address of timer.
  */
@@ -609,11 +569,7 @@ static void light_switch_button_handler(struct k_timer *timer)
 
 	if (dk_get_buttons() & buttons_ctx.state) {
 		atomic_set(&buttons_ctx.long_poll, ZB_TRUE);
-		if (buttons_ctx.state == BUTTON_ON) {
-			cmd_id = ZB_ZCL_LEVEL_CONTROL_STEP_MODE_UP;
-		} else {
-			cmd_id = ZB_ZCL_LEVEL_CONTROL_STEP_MODE_DOWN;
-		}
+		cmd_id = ZB_ZCL_LEVEL_CONTROL_STEP_MODE_UP;
 
 		/* Allocate output buffer and send step command. */
 		zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_step, cmd_id, 0);
