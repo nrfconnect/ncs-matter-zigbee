@@ -43,10 +43,10 @@ Nrf::Matter::IdentifyCluster sIdentifyCluster(kLightEndpointId);
 
 bool sWasDimmerTriggered = false;
 
-#define APPLICATION_BUTTON_MASK DK_BTN2_MSK
+#define APPLICATION_BUTTON_MASK DK_BTN3_MSK
 
 #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-#define UAT_BUTTON_MASK DK_BTN3_MSK
+#define UAT_BUTTON_MASK DK_BTN2_MSK
 #endif
 } /* namespace */
 
@@ -158,18 +158,18 @@ CHIP_ERROR AppTask::Init()
 	k_timer_init(&sDimmerPressKeyTimer, AppTask::UserTimerTimeoutCallback, nullptr);
 	k_timer_init(&sDimmerTimer, AppTask::UserTimerTimeoutCallback, nullptr);
 
-	if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
-		LOG_ERR("User interface initialization failed.");
-		return CHIP_ERROR_INCORRECT_STATE;
-	}
+// 	if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
+// 		LOG_ERR("User interface initialization failed.");
+// 		return CHIP_ERROR_INCORRECT_STATE;
+// 	}
 
-#if defined(CONFIG_MATTER_ZIGBEE_SMP_DFU)
-	matter_zigbee_smp_dfu_init();
-#endif
+// #if defined(CONFIG_MATTER_ZIGBEE_SMP_DFU)
+// 	matter_zigbee_smp_dfu_init();
+// #endif
 
-	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network
-	 * state. */
-	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
+// 	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network
+// 	 * state. */
+// 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
 	ReturnErrorOnFailure(sIdentifyCluster.Init());
 

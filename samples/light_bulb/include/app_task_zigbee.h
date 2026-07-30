@@ -17,24 +17,16 @@ int ZigbeeStart(void);
 
 #ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE
 /**
- * @brief Button handler for Zigbee in combined Matter+Zigbee builds.
+ * @brief Sample-specific button handler for Zigbee in combined builds.
  *
- * Processes button events when Zigbee is the active protocol. Returns
- * immediately when Matter is active so Matter's own handlers (registered
- * by Board::Init() during AppTask initialisation) take full ownership.
+ * Invoked from the common UI module when a button event is received.
+ * Processes button events when Zigbee is the active protocol and returns
+ * immediately when Matter is active.
  *
  * @param button_state  Bitmask containing buttons state.
  * @param has_changed   Bitmask containing buttons that changed state.
  */
 void zb_button_handler(uint32_t button_state, uint32_t has_changed);
-
-/**
- * @brief Register the Zigbee button handler with the DK library.
- *
- * Must be called after Matter's Board::Init() (which runs dk_buttons_init())
- * so that dk_button_handler_add() finds an initialised subsystem.
- */
-void zb_register_button_handler(void);
 #endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 
 #ifdef __cplusplus

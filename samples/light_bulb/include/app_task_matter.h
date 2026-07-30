@@ -35,11 +35,12 @@ public:
 	void InitPWMDDevice();
 	Nrf::PWMDevice &GetPWMDevice() { return mPWMDevice; }
 
+	static void ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged);
+
 private:
 	CHIP_ERROR Init();
 
 	static void LightingActionEventHandler(const LightingEvent &event);
-	static void ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged);
 
 	static void ActionInitiated(Nrf::PWMDevice::Action_t action, int32_t actor);
 	static void ActionCompleted(Nrf::PWMDevice::Action_t action, int32_t actor);

@@ -25,6 +25,8 @@ public:
 
 	void UpdateClusterState();
 
+	static void ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged);
+
 private:
 	enum Timer : uint8_t { DimmerTrigger, Dimmer };
 
@@ -32,7 +34,6 @@ private:
 
 	static void DimmerTriggerEventHandler();
 	static void TimerEventHandler(const Timer &event);
-	static void ButtonEventHandler(Nrf::ButtonState state, Nrf::ButtonMask hasChanged);
 
 	static void StartTimer(Timer, uint32_t);
 	static void CancelTimer(Timer);

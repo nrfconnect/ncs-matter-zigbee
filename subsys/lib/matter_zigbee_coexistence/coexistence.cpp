@@ -125,11 +125,11 @@ void zigbee_thread_fn()
 		ret = nrf_802154_callbacks_dispatcher_switch("openthread");
 		__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
 
-		/* Still chain sample button handlers after Matter board init. */
+		/* Initialise common UI buttons after Matter server is ready. */
 		(void)k_sem_take(&matter_init_done_sem, K_FOREVER);
 		start_thread_network_if_commissioned();
-		if (g_cb->post_matter_board_init != NULL) {
-			g_cb->post_matter_board_init();
+		if (g_cb->post_matter_ui_init != NULL) {
+			g_cb->post_matter_ui_init();
 		}
 		return;
 	}
@@ -139,8 +139,8 @@ void zigbee_thread_fn()
 
 	(void)k_sem_take(&matter_init_done_sem, K_FOREVER);
 
-	if (g_cb->post_matter_board_init != NULL) {
-		g_cb->post_matter_board_init();
+	if (g_cb->post_matter_ui_init != NULL) {
+		g_cb->post_matter_ui_init();
 	}
 
 	(void)g_cb->zigbee_start();

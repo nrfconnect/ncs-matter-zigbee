@@ -13,6 +13,7 @@
 #include "app_task_zigbee.h"
 
 #include <matter_zigbee_coexistence.h>
+#include <matter_zigbee_ui.h>
 
 #include <zephyr/logging/log.h>
 
@@ -26,15 +27,33 @@ void matter_start_cb(void)
 	AppTask::Instance().StartApp();
 }
 
+bool app_ui_button_handler(uint32_t button_state, uint32_t has_changed, active_protocol_t active_protocol)
+{
+	if (active_protocol == PROTOCOL_ZIGBEE) {
+		zb_button_handler(button_state, has_changed);
+	}
+
+	if (active_protocol == PROTOCOL_MATTER) {
+		AppTask::ButtonEventHandler(button_state, has_changed);
+	}
+
+	return false;
+}
+
+const struct matter_zigbee_ui_callbacks ui_callbacks = {
+	.on_button = app_ui_button_handler,
+};
+
 const struct matter_zigbee_coexistence_callbacks coexistence_cb = {
 	matter_start_cb,
 	ZigbeeStart,
-	zb_register_button_handler,
+	matter_zigbee_ui_register,
 };
 
 } /* namespace */
 
 int main(void)
 {
+	matter_zigbee_ui_set_callbacks(&ui_callbacks);
 	return matter_zigbee_coexistence_run(&coexistence_cb);
 }
