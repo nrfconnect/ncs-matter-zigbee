@@ -16,6 +16,8 @@
 #include <matter_zigbee_protocol_state.h>
 #endif
 
+#include <matter_zigbee_ui_config.h>
+
 #include <soc.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/pwm.h>
@@ -97,23 +99,15 @@ extern "C" {
  */
 #define BULB_INIT_BASIC_PH_ENV ZB_ZCL_BASIC_ENV_UNSPECIFIED
 
-/* LED indicating that light switch successfully joind Zigbee network. */
-#define ZIGBEE_NETWORK_STATE_LED DK_LED3
-
-/* LED immitaing dimmable light bulb - define for informational
- * purposes only.
- */
-#define BULB_LED DK_LED4
+/* LED imitating dimmable light bulb - define for informational purposes only. */
+#define BULB_LED DK_LED3
 
 #if CONFIG_ZIGBEE_FOTA
 #define OTA_ACTIVITY_LED DK_LED2
 #endif
 
-/* Button used to enter the Bulb into the Identify mode. */
-#define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
-
-/* Use onboard led4 to act as a light bulb.
- * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
+/* Use onboard LED 2 (DK_LED3) as the light bulb.
+ * The board overlay exposes PWM for this LED at node label "pwm_led3" in /pwmleds.
  */
 #define PWM_DK_LED_NODE DT_NODELABEL(pwm_led3)
 
@@ -129,9 +123,6 @@ static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED_NODE);
 #ifndef ZB_ROUTER_ROLE
 #error Define ZB_ROUTER_ROLE to compile router source code.
 #endif
-
-/* Button to start Factory Reset */
-#define FACTORY_RESET_BUTTON IDENTIFY_MODE_BUTTON
 
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -230,8 +221,8 @@ static void start_identifying(zb_bufid_t bufid)
  */
 static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 {
-	if (IDENTIFY_MODE_BUTTON & has_changed) {
-		if (IDENTIFY_MODE_BUTTON & button_state) {
+	if (MATTER_ZIGBEE_UI_BUTTON_IDENTIFY & has_changed) {
+		if (MATTER_ZIGBEE_UI_BUTTON_IDENTIFY & button_state) {
 			/* Button changed its state to pressed */
 		} else {
 			/* Button changed its state to released */
@@ -297,7 +288,7 @@ static void light_bulb_set_brightness(zb_uint8_t brightness_level)
 	uint32_t pulse = brightness_level * LED_PWM_PERIOD_US / 255U;
 
 	if (pwm_set_dt(&led_pwm, PWM_USEC(LED_PWM_PERIOD_US), PWM_USEC(pulse))) {
-		LOG_ERR("Pwm led 4 set fails:\n");
+		LOG_ERR("Pwm led 3 set fails:\n");
 		return;
 	}
 }
@@ -351,7 +342,7 @@ static void on_off_set_value(zb_bool_t on)
 	}
 }
 
-/**@brief Function to toggle the identify LED - BULB_LED is used for this.
+/**@brief Function to toggle the identify LED.
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
@@ -359,7 +350,7 @@ static void toggle_identify_led(zb_bufid_t bufid)
 {
 	static int blink_status;
 
-	light_bulb_set_brightness(((++blink_status) % 2) ? (255U) : (0U));
+	dk_set_led(MATTER_ZIGBEE_UI_LED_IDENTIFY, (++blink_status) % 2);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -372,19 +363,12 @@ static void identify_cb(zb_bufid_t bufid)
 	zb_ret_t zb_err_code;
 
 	if (bufid) {
-		/* Schedule a self-scheduling function that will toggle the LED. */
 		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, bufid);
 	} else {
-		/* Cancel the toggling function alarm and restore current Zigbee LED state.
-		 */
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
 
-		if (dev_ctx.on_off_attr.on_off) {
-			level_control_set_value(light_bulb_on_brightness());
-		} else {
-			light_bulb_set_brightness(0U);
-		}
+		dk_set_led_off(MATTER_ZIGBEE_UI_LED_IDENTIFY);
 	}
 }
 
@@ -561,7 +545,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 #endif
 
 	/* Update network status LED. */
-	zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
+	zigbee_led_status_update(bufid, MATTER_ZIGBEE_UI_LED_ZIGBEE);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
 	zigbee_touchlink_target_signal_handler(bufid);
@@ -599,7 +583,6 @@ extern "C" int ZigbeeStart(void)
 		LOG_ERR("settings initialization failed");
 	}
 #endif
-	register_factory_reset_button(FACTORY_RESET_BUTTON);
 
 #endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 
