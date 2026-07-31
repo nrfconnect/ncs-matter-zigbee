@@ -58,7 +58,7 @@ Touchlink commissioning
 When ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is enabled, the light switch can act as a Touchlink initiator.
 This lets the device commission directly with a nearby Touchlink target (for example, the :ref:`matter_zigbee_light_bulb_sample`) and form a distributed-security Zigbee network without a Zigbee Coordinator.
 
-Short-press **Button 2** during normal operation to start Touchlink commissioning.
+Short-press **Button 1** during normal operation to start Touchlink commissioning.
 A long press on the same button switches protocol instead; see :ref:`matter_zigbee_limitations`.
 
 .. note::
@@ -111,38 +111,34 @@ For more information about configuration files in the |NCS|, see `Build and conf
 User interface
 **************
 
-LED 2:
-    Lit and solid when the device is connected to a Zigbee network.
+.. include:: /includes/ui_common.txt
 
-LED 3:
-    Lit and solid when the light switch has found a light bulb to control.
-
-Button 0:
-    Turn on the light bulb connected to the network (light bulb's **LED 1**).
-    This option is available after the successful commissioning (light switch's **LED 2** turned on).
-
-    Pressing this button for a longer period of time increases the brightness of the **LED 1** of the connected light bulb.
+Sample-specific (light switch)
+==============================
 
 Button 1:
-    Turn off the light bulb connected to the network (light bulb's **LED 1**).
-    This option is available after the successful commissioning (light switch's **LED 2** turned on).
+    Short press on the light switch (in addition to the protocol-switch long
+    press described above):
 
-    Pressing this button for a longer period of time decreases the brightness of the **LED 1** of the connected light bulb.
+    * **Zigbee active:** Starts Touchlink commissioning when ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is enabled (see :ref:`matter_zigbee_light_switch_touchlink`).
+    * **Matter active:** Triggers ICD User Active Mode when ``CONFIG_CHIP_ICD_UAT_SUPPORT`` is enabled.
+
+LED 2:
+    **Zigbee active:** Solid on when the switch has found a controllable light bulb on the Zigbee network (Match Descriptor succeeded).
+    Off before a bulb is found.
+    **Matter active:** Off (not used).
 
 Button 2:
-    When ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is enabled, a short press during normal operation (after boot) starts Touchlink commissioning as initiator.
-    If :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH` is enabled (default), a long press (:option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`, 5 s by default) triggers a protocol switch.
+    **Both Matter and Zigbee:** Controls bound lights.
+    Available after **LED 2** turns on (Zigbee) or after Matter binding is set up (Matter).
 
-Button 3:
-    When pressed for five seconds, it initiates the factory reset of the device.
-    The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from the Zigbee application utilities library in the `Zigbee R23 add-on`_.
-    Releasing the button within this time does not trigger the factory reset procedure.
+    * **Short press and release:** Toggle on/off.
+    * **Press and hold (≥ 500 ms):** Dim up continuously while held.
+      Releasing after dimming does not toggle.
 
-LED 0:
-    Blinks while Bluetooth LE advertising for SMP is active.
-
-.. note::
-    If the brightness level is at the minimum level, you may not notice the effect of turning on the light bulb.
+    **Zigbee only — boot option:** Hold Button 2 while the device boots to
+    enable sleepy End Device behavior (see sample Kconfig help for low-power
+    variants).
 
 Building and running
 ********************
@@ -166,16 +162,16 @@ After programming the sample to your development kits, complete the following st
 
 #. Turn on the development kit that runs the Zigbee-only Light bulb sample.
 
-   When **LED 2** turns on, the light bulb has become a Router inside the network.
+   When **LED 1** turns on, the light bulb has become a Router inside the network.
 
    .. note::
-        If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
+        If **LED 1** does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
 #. Turn on the development kit that runs the Light switch sample.
 
-   When **LED 2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+   When **LED 1** turns on, the light switch has become an End Device, connected directly to the Coordinator.
 
-#. Wait until **LED 3** on the light switch node turns on.
+#. Wait until **LED 2** on the light switch node turns on.
 
    This LED indicates that the light switch found a light bulb to control.
 
@@ -205,7 +201,7 @@ Complete the following steps:
         The two devices form a distributed-security Zigbee network and the light switch finds the bulb to control, without a Zigbee Coordinator on the network.
 
    While the device is still a Zigbee End Device, it also advertises for Matter commissioning over Bluetooth LE if :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE` is enabled.
-#. Optionally, long-press Button 2 for :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS` to switch to Matter.
+#. Optionally, long-press Button 1 for :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS` to switch to Matter.
    The Zigbee stack is stopped and the radio is handed to OpenThread.
    Skip the next step if you use this path and Matter was already commissioned in a previous session.
 #. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
@@ -213,7 +209,7 @@ Complete the following steps:
 #. Bind the light switch to a Matter light (for example, with ``chip-tool binding write binding …``) and use the dimmer button to toggle or dim the bound light over Thread.
 #. To return the device to Zigbee operation, use one of the following:
 
-   * Long-press Button 2 for :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`.
+   * Long-press Button 1 for :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`.
      The device reboots and resumes as a Zigbee End Device.
    * Or trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
      The device reboots as a fresh Zigbee End Device with Matter Bluetooth LE advertising active again, and Matter storage is cleared.

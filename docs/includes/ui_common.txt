@@ -1,0 +1,65 @@
+All the Matter and Zigbee combined samples share button and status-LED handling through the
+:file:`matter_zigbee_ui` library (:file:`include/matter_zigbee_ui_config.h`).
+Sample-specific buttons and LEDs are defined in each sample's
+:file:`include/app_ui_config.h`.
+
+The descriptions below apply while the device runs either protocol.
+Sample-specific controls are active only for the persisted active protocol
+(see the sample overview).
+
+Common status LEDs
+------------------
+
+LED 0 (Matter):
+   Matter connectivity and commissioning readiness.
+
+   * **Matter active:** Solid on when the device is provisioned on Thread.
+     Slow blink while waiting for commissioning; fast blink while a Bluetooth LE
+     commissioning connection is active.
+   * **Zigbee active:** Off when Matter is already provisioned. Otherwise
+     mirrors Bluetooth LE commissioning advertising (slow or fast blink) so you can
+     commission over CHIPoBLE while Zigbee owns the 802.15.4 radio.
+
+LED 1 (Zigbee):
+   Zigbee network status when Zigbee is the active protocol.
+
+   * Off when Matter is active.
+   * Blinks while Zigbee is active but not joined to a network (even when paired using Zigbee touchlink)
+   * Solid on when joined.
+
+LED 3 (Identify):
+   Blinks during Identify mode (Zigbee Identify cluster or Matter Identify
+   cluster / TriggerEffect).
+
+Common buttons
+--------------
+
+Button 0:
+   Multiplexed factory reset and (optionally) SMP DFU entry.
+
+   * **Short press** (when ``CONFIG_MATTER_ZIGBEE_UI_SMP_DFU`` is enabled):
+     Starts Bluetooth LE advertising for SMP firmware update. If the device is
+     not commissioned to a Matter fabric, Matter commissioning advertising is
+     started as well; if already commissioned, only the SMP server is enabled.
+   * **Long press — factory reset:**
+
+     * **Zigbee active:** Uses the Zigbee application utilities factory-reset
+       gesture on Button 0 (``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` from
+       the `Zigbee R23 add-on`_).
+     * **Matter active:** Two-step gesture on Button 0 controlled by
+       :option:`CONFIG_MATTER_ZIGBEE_UI_FACTORY_RESET_PRESS_TIME_SECONDS`
+       (5 s by default): hold for the first half of the timeout, then either
+       release to cancel or keep pressed through the cancel window to confirm.
+
+Button 1:
+   **Long press** (when :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH`
+   is enabled): Switches the active protocol after
+   :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`
+   (5 s by default). Ignored during Zigbee join or Matter commissioning.
+
+Button 3:
+   **Zigbee active:** Short press and release toggles local Identify mode
+   (LED 3 blinks).
+
+   **Matter active:** Identify is driven by the Matter Identify cluster
+   (controller or binding peer); Button 3 is not used for local identify.
