@@ -30,14 +30,8 @@ constexpr uint32_t kDisconnectedOffMs = 950U;
 constexpr uint32_t kBleConnectedOnMs = 100U;
 constexpr uint32_t kBleConnectedOffMs = 100U;
 
-void apply_status_led(void)
+void apply_matter_led_for_state(void)
 {
-	if (!protocol_is_matter_active()) {
-		matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_MATTER);
-		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_MATTER, false);
-		return;
-	}
-
 	switch (s_device_state) {
 	case DeviceState::Provisioned:
 		matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_MATTER);
@@ -52,6 +46,36 @@ void apply_status_led(void)
 		matter_zigbee_ui_led_blink(MATTER_ZIGBEE_UI_LED_MATTER, kDisconnectedOnMs, kDisconnectedOffMs);
 		break;
 	}
+}
+
+void apply_status_led(void)
+{
+	if (!protocol_is_matter_active()) {
+		/* Zigbee owns the radio. Show Matter commissioning readiness only. */
+		if (s_network_provisioned) {
+			matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_MATTER);
+			matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_MATTER, false);
+			return;
+		}
+
+		switch (s_device_state) {
+		case DeviceState::ConnectedBle:
+			matter_zigbee_ui_led_blink(MATTER_ZIGBEE_UI_LED_MATTER, kBleConnectedOnMs, kBleConnectedOffMs);
+			break;
+		case DeviceState::AdvertisingBle:
+			matter_zigbee_ui_led_blink(MATTER_ZIGBEE_UI_LED_MATTER, kDisconnectedOnMs, kDisconnectedOffMs);
+			break;
+		case DeviceState::Provisioned:
+		case DeviceState::Disconnected:
+		default:
+			matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_MATTER);
+			matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_MATTER, false);
+			break;
+		}
+		return;
+	}
+
+	apply_matter_led_for_state();
 }
 
 void update_device_state(void)
