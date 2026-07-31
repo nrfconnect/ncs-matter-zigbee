@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 void matter_zigbee_ui_matter_factory_reset_init(void);
-void matter_zigbee_ui_matter_factory_reset_button(uint32_t button_state, uint32_t has_changed);
+void matter_zigbee_ui_matter_factory_reset_button_handler(uint32_t button_state, uint32_t has_changed);
 
 #ifdef __cplusplus
 }

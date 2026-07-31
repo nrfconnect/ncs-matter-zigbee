@@ -32,7 +32,7 @@ void start_ble_advertisement_on_button_press(void)
 
 } /* namespace */
 
-extern "C" void matter_zigbee_ui_smp_dfu_button(uint32_t button_state, uint32_t has_changed)
+extern "C" void matter_zigbee_ui_smp_dfu_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	if (!(has_changed & MATTER_ZIGBEE_UI_BUTTON_SMP_DFU) ||
 	    !(button_state & MATTER_ZIGBEE_UI_BUTTON_SMP_DFU)) {

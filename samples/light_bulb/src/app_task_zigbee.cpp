@@ -232,38 +232,6 @@ extern "C" void zb_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	zb_button_handler_impl(button_state, has_changed);
 }
-#else
-/**@brief Callback wrapper for button events (Zigbee-only builds). */
-static void button_changed(uint32_t button_state, uint32_t has_changed)
-{
-	zb_button_handler_impl(button_state, has_changed);
-}
-
-/**@brief Function for initializing additional PWM leds. */
-static void pwm_led_init(void)
-{
-	if (!device_is_ready(led_pwm.dev)) {
-		LOG_ERR("Error: PWM device %s is not ready", led_pwm.dev->name);
-	}
-}
-
-/**@brief Function for initializing LEDs and Buttons. */
-static void configure_gpio(void)
-{
-	int err;
-
-	err = dk_buttons_init(button_changed);
-	if (err) {
-		LOG_ERR("Cannot init buttons (err: %d)", err);
-	}
-
-	err = dk_leds_init();
-	if (err) {
-		LOG_ERR("Cannot init LEDs (err: %d)", err);
-	}
-
-	pwm_led_init();
-}
 #endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 
 /**@brief Sets brightness of bulb luminous executive element
@@ -529,7 +497,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 #endif
 
 	/* Update network status LED. */
-	matter_zigbee_ui_zigbee_network_led_update(bufid);
+	matter_zigbee_ui_zigbee_led_update(bufid);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
 	zigbee_touchlink_target_signal_handler(bufid);
@@ -556,18 +524,6 @@ extern "C" int ZigbeeStart(void)
 #endif
 
 	LOG_INF("Starting Zigbee R23 Light Bulb example");
-
-	/* Initialize Buttons and Leds only if not using Matter */
-#ifndef CONFIG_MATTER_ZIGBEE_COEXISTENCE
-	configure_gpio();
-#ifdef CONFIG_ZIGBEE_SCENES
-	err = settings_subsys_init();
-	if (err) {
-		LOG_ERR("settings initialization failed");
-	}
-#endif
-
-#endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 
 	/* Register callback for handling ZCL commands. */
 	ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);

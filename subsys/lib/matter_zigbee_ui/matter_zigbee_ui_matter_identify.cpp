@@ -10,9 +10,6 @@
 #include <matter_zigbee_ui.h>
 #include <matter_zigbee_ui_config.h>
 
-namespace matter_zigbee_ui
-{
-
 namespace
 {
 
@@ -66,5 +63,3 @@ void IdentifyDelegate::OnTriggerEffect(chip::app::Clusters::IdentifyCluster &clu
 		break;
 	}
 }
-
-} /* namespace matter_zigbee_ui */
