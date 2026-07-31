@@ -39,7 +39,7 @@ static bool s_registered;
 static bool s_protocol_switch_short_release;
 static bool s_zigbee_network_joined;
 
-static void zigbee_network_led_apply(void)
+static void zigbee_led_refresh(void)
 {
 	if (!protocol_is_zigbee_active()) {
 		matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_ZIGBEE);
@@ -57,14 +57,14 @@ static void zigbee_network_led_apply(void)
 	}
 }
 
-void matter_zigbee_ui_zigbee_network_led_update(uint8_t bufid)
+void matter_zigbee_ui_zigbee_led_update(uint8_t bufid)
 {
 	zb_zdo_app_signal_hdr_t *signal_header = NULL;
 	const zb_zdo_app_signal_type_t signal = zb_get_app_signal(bufid, &signal_header);
 	const zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
 
 	if (!protocol_is_zigbee_active()) {
-		zigbee_network_led_apply();
+		zigbee_led_refresh();
 		return;
 	}
 
@@ -83,13 +83,13 @@ void matter_zigbee_ui_zigbee_network_led_update(uint8_t bufid)
 		return;
 	}
 
-	zigbee_network_led_apply();
+	zigbee_led_refresh();
 }
 
 void matter_zigbee_ui_protocol_leds_refresh(void)
 {
 	matter_zigbee_ui_matter_status_refresh();
-	zigbee_network_led_apply();
+	zigbee_led_refresh();
 }
 
 void matter_zigbee_ui_set_callbacks(const struct matter_zigbee_ui_callbacks *callbacks)
@@ -144,7 +144,7 @@ static void ui_handle_factory_reset(uint32_t button_state, uint32_t has_changed)
 		check_factory_reset_button(button_state, has_changed);
 #endif
 	} else {
-		matter_zigbee_ui_matter_factory_reset_button(button_state, has_changed);
+		matter_zigbee_ui_matter_factory_reset_button_handler(button_state, has_changed);
 	}
 }
 
@@ -158,7 +158,7 @@ static void ui_button_handler(uint32_t button_state, uint32_t has_changed)
 #endif
 
 #if defined(CONFIG_MATTER_ZIGBEE_UI_SMP_DFU)
-	matter_zigbee_ui_smp_dfu_button(button_state, has_changed);
+	matter_zigbee_ui_smp_dfu_button_handler(button_state, has_changed);
 #endif
 
 	ui_handle_factory_reset(button_state, has_changed);

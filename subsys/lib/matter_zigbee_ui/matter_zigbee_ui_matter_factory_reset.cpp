@@ -23,6 +23,10 @@ namespace
 
 enum class FactoryResetState : uint8_t { None, TriggerWait, CancelWindow };
 
+/* Half of CONFIG_MATTER_ZIGBEE_UI_FACTORY_RESET_PRESS_TIME_SECONDS value is the initial hold 
+ * before the cancel window opens; the other half is the cancel window duration
+ * (keeping the button pressed through it confirms the reset). 
+ */
 constexpr uint32_t kFactoryResetTriggerTimeoutMs =
 	(CONFIG_MATTER_ZIGBEE_UI_FACTORY_RESET_PRESS_TIME_SECONDS * 1000U) / 2U;
 constexpr uint32_t kFactoryResetCancelWindowTimeoutMs =
@@ -72,7 +76,7 @@ extern "C" void matter_zigbee_ui_matter_factory_reset_init(void)
 	k_timer_init(&s_factory_reset_timer, factory_reset_timer_timeout, nullptr);
 }
 
-extern "C" void matter_zigbee_ui_matter_factory_reset_button(uint32_t button_state, uint32_t has_changed)
+extern "C" void matter_zigbee_ui_matter_factory_reset_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	if (!(has_changed & MATTER_ZIGBEE_UI_BUTTON_FACTORY_RESET)) {
 		return;

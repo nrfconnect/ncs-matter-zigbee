@@ -34,8 +34,7 @@ config MATTER_ZIGBEE_UI_SMP_DFU
 	depends on NCS_SAMPLE_MATTER_CUSTOM_BLUETOOTH_ADVERTISING
 	default y
 	help
-	  Short press on MATTER_ZIGBEE_UI_BUTTON_SMP_DFU starts SMP DFU
-	  advertising.
+	  Enables button handling to start BT SMP DFU advertising.
 
 module = MATTER_ZIGBEE_UI
 module-str = Matter/Zigbee UI

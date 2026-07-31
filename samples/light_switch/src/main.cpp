@@ -29,6 +29,7 @@ void matter_start_cb(void)
 
 bool app_ui_button_handler(uint32_t button_state, uint32_t has_changed, active_protocol_t active_protocol)
 {
+	/* Handle button events only for the active protocol. */
 	if (active_protocol == PROTOCOL_ZIGBEE) {
 		zb_button_handler(button_state, has_changed);
 	}

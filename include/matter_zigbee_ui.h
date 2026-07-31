@@ -17,21 +17,6 @@
  * @ref matter_zigbee_ui_register as the coexistence
  * @c post_matter_ui_init hook once Matter server initialisation is complete.
  *
- * Factory reset (@ref MATTER_ZIGBEE_UI_BUTTON_FACTORY_RESET) and SMP DFU
- * (@ref MATTER_ZIGBEE_UI_BUTTON_SMP_DFU) may use the same physical button:
- * a short press starts SMP DFU; a long press factory-resets the active stack.
- * Matter factory-reset timing is configured by
- * @kconfig{CONFIG_MATTER_ZIGBEE_UI_FACTORY_RESET_PRESS_TIME_SECONDS} (split
- * equally between the initial hold and cancel window).
- *
- * SMP DFU requires @kconfig{CONFIG_MATTER_ZIGBEE_UI_SMP_DFU}.
- *
- * @ref MATTER_ZIGBEE_UI_LED_MATTER and @ref MATTER_ZIGBEE_UI_LED_ZIGBEE show
- * connectivity for the active protocol. While Zigbee is active, LED1 may still
- * blink when Matter BLE commissioning advertising is enabled. @ref
- * matter_zigbee_ui_register() wires the handlers.
- *
- * LED indices match @c DK_LED1 … (@ref matter_zigbee_ui_config.h).
  * @ref matter_zigbee_ui_register() calls @c dk_leds_init().
  */
 
@@ -89,7 +74,7 @@ bool matter_zigbee_ui_consume_protocol_switch_short_release(void);
  */
 void matter_zigbee_ui_register(void);
 
-/** @brief Set a DK LED on or off (@c DK_LED1 = 0). */
+/** @brief Set a DK LED on or off. */
 void matter_zigbee_ui_led_set(uint8_t led, bool on);
 
 /** @brief Return the last on/off state set through @ref matter_zigbee_ui_led_set(). */
@@ -108,12 +93,12 @@ void matter_zigbee_ui_led_blink_stop(uint8_t led);
  *
  * Call from the sample @c zboss_signal_handler(). The LED is off when Matter is
  * active, solid on when Zigbee is active and joined, and blinks while Zigbee is
- * active but not joined. LED1 may blink at the same time when Matter BLE
+ * active but not joined. LED may blink at the same time when Matter BLE
  * commissioning advertising is enabled.
  *
  * @param bufid ZBOSS application signal buffer id (@c zb_bufid_t).
  */
-void matter_zigbee_ui_zigbee_network_led_update(uint8_t bufid);
+void matter_zigbee_ui_zigbee_led_update(uint8_t bufid);
 
 /** @brief Re-apply both protocol connectivity LEDs from persisted protocol state.
  *

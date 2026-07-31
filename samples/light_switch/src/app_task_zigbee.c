@@ -351,30 +351,6 @@ void zb_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	zb_button_handler_impl(button_state, has_changed);
 }
-#else
-/**@brief Callback wrapper for button events (non-Matter builds). */
-static void button_handler(uint32_t button_state, uint32_t has_changed)
-{
-	zb_button_handler_impl(button_state, has_changed);
-}
-
-/**@brief Function for initializing LEDs and Buttons. */
-static void configure_gpio(void)
-{
-	int err;
-
-	err = dk_buttons_init(button_handler);
-	if (err) {
-		LOG_ERR("Cannot init buttons (err: %d)", err);
-	}
-
-#if !defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
-	err = dk_leds_init();
-	if (err) {
-		LOG_ERR("Cannot init LEDs (err: %d)", err);
-	}
-#endif
-}
 #endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE */
 
 static void alarm_timers_init(void)
@@ -643,7 +619,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
 
 	/* Update network status LED. */
-	matter_zigbee_ui_zigbee_network_led_update(bufid);
+	matter_zigbee_ui_zigbee_led_update(bufid);
 
 #ifdef CONFIG_ZIGBEE_FOTA
 	/* Pass signal to the OTA client implementation. */

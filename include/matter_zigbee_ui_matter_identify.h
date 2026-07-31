@@ -17,9 +17,6 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/TimerDelegate.h>
 
-namespace matter_zigbee_ui
-{
-
 /** @brief Identify delegate that blinks @ref MATTER_ZIGBEE_UI_LED_IDENTIFY. */
 class IdentifyDelegate : public chip::app::Clusters::IdentifyDelegate {
 public:
@@ -68,7 +65,5 @@ private:
 	chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> mIdentifyCluster;
 	chip::app::DefaultTimerDelegate mTimerDelegate;
 };
-
-} /* namespace matter_zigbee_ui */
 
 #endif /* MATTER_ZIGBEE_UI_MATTER_IDENTIFY_H_ */

@@ -14,6 +14,8 @@
 #endif
 
 #include <matter_zigbee_ui_matter_identify.h>
+#include <matter_zigbee_ui.h>
+#include <matter_zigbee_ui_config.h>
 
 #include "app_ui_config.h"
 
@@ -30,9 +32,6 @@
 #include <matter_zigbee_coexistence.h>
 #endif
 
-#include <matter_zigbee_ui.h>
-#include <matter_zigbee_ui_config.h>
-
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -45,7 +44,7 @@ constexpr EndpointId kLightEndpointId = 1;
 constexpr uint8_t kDefaultMinLevel = 0;
 constexpr uint8_t kDefaultMaxLevel = 254;
 
-matter_zigbee_ui::MatterIdentifyCluster sIdentifyCluster(kLightEndpointId, true);
+MatterIdentifyCluster sIdentifyCluster(kLightEndpointId, true);
 
 #if defined(CONFIG_PWM)
 const struct pwm_dt_spec sLightPwmDevice = PWM_DT_SPEC_GET(APP_UI_PWM_LIGHT_NODE);

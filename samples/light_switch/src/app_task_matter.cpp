@@ -37,7 +37,7 @@ constexpr EndpointId kLightEndpointId = 1;
 k_timer sDimmerPressKeyTimer;
 k_timer sDimmerTimer;
 
-matter_zigbee_ui::MatterIdentifyCluster sIdentifyCluster(kLightEndpointId);
+MatterIdentifyCluster sIdentifyCluster(kLightEndpointId);
 
 bool sWasDimmerTriggered = false;
 } /* namespace */
