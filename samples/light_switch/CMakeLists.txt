@@ -28,9 +28,19 @@ target_sources(app PRIVATE
 	src/main.cpp
 	src/app_task_matter.cpp
 	src/app_task_zigbee.c
+	src/zboss_mem_globals.c
 	src/light_switch.cpp
 	src/shell_commands.cpp
 	${ZEPHYR_NRF_MODULE_DIR}/samples/matter/common/src/binding/binding_handler.cpp
 )
+
+# LTO link: zb_memconfig.o from prebuilts is plain ELF (weak gc_*); strong gc_*
+# in zb_mem_config_context.h must not be LTO bytecode or ld warns about symbol size.
+if(CONFIG_LTO)
+	set_source_files_properties(
+		src/zboss_mem_globals.c
+		PROPERTIES COMPILE_OPTIONS -fno-lto
+	)
+endif()
 
 ncs_configure_data_model()

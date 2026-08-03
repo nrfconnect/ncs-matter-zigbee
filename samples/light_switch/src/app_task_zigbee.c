@@ -23,7 +23,6 @@
 #include <zephyr/sys/util.h>
 
 #include "zb_dimmer_switch.h"
-#include "zb_mem_config_custom.h"
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
