@@ -12,6 +12,8 @@
 #include "app_task_matter.h"
 #include "app_task_zigbee.h"
 
+#include "app_ui_config.h"
+
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_ui.h>
 
@@ -41,8 +43,16 @@ bool app_ui_button_handler(uint32_t button_state, uint32_t has_changed, active_p
 	return false;
 }
 
+static void app_ui_protocol_changed(active_protocol_t active_protocol)
+{
+	if (active_protocol == PROTOCOL_MATTER) {
+		matter_zigbee_ui_led_set(APP_UI_LED_ZIGBEE_BULB_FOUND, false);
+	}
+}
+
 const struct matter_zigbee_ui_callbacks ui_callbacks = {
 	.on_button = app_ui_button_handler,
+	.on_protocol_changed = app_ui_protocol_changed,
 };
 
 const struct matter_zigbee_coexistence_callbacks coexistence_cb = {

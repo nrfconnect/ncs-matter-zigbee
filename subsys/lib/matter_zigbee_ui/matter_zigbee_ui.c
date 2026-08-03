@@ -90,6 +90,10 @@ void matter_zigbee_ui_protocol_leds_refresh(void)
 {
 	matter_zigbee_ui_matter_status_refresh();
 	zigbee_led_refresh();
+
+	if (s_callbacks != NULL && s_callbacks->on_protocol_changed != NULL) {
+		s_callbacks->on_protocol_changed(protocol_state_get());
+	}
 }
 
 void matter_zigbee_ui_set_callbacks(const struct matter_zigbee_ui_callbacks *callbacks)
