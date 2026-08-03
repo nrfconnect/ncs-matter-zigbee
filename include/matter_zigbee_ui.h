@@ -40,6 +40,15 @@ struct matter_zigbee_ui_callbacks {
 	 *  @return true if the sample consumed the event, false otherwise.
 	 */
 	bool (*on_button)(uint32_t button_state, uint32_t has_changed, active_protocol_t active_protocol);
+
+	/** Optional hook invoked from @ref matter_zigbee_ui_protocol_leds_refresh() after
+	 *  common protocol LEDs are updated.
+	 *
+	 *  Samples use this to turn off protocol-specific indicators that are not
+	 *  managed by the common UI module (for example the light switch
+	 *  "bulb found" LED when handing the radio over to Matter).
+	 */
+	void (*on_protocol_changed)(active_protocol_t active_protocol);
 };
 
 /** @brief Register sample UI callbacks.
