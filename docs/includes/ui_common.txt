@@ -27,7 +27,7 @@ LED 1 (Zigbee):
    * Blinks while Zigbee is active but not joined to a network (even when paired using Zigbee touchlink)
    * Solid on when joined.
 
-LED 3 (Identify):
+LED 2 (Identify):
    Blinks during Identify mode (Zigbee Identify cluster or Matter Identify
    cluster / TriggerEffect).
 
@@ -59,7 +59,7 @@ Button 1:
 
 Button 3:
    **Zigbee active:** Short press and release toggles local Identify mode
-   (LED 3 blinks).
+   (LED 2 blinks).
 
    **Matter active:** Identify is driven by the Matter Identify cluster
    (controller or binding peer); Button 3 is not used for local identify.

@@ -33,7 +33,7 @@
 #endif
 
 /** LED solid on when a controllable bulb has been found (Zigbee). */
-#define APP_UI_LED_ZIGBEE_BULB_FOUND DK_LED3
+#define APP_UI_LED_ZIGBEE_BULB_FOUND DK_LED4
 
 /** Sampled once at boot to enable sleepy End Device behavior (Zigbee). */
 #define APP_UI_BUTTON_ZIGBEE_SLEEPY DK_BTN3_MSK

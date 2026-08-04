@@ -22,8 +22,8 @@
 /** Button 3: toggle main light (Matter). */
 #define APP_UI_BUTTON_LIGHT_TOGGLE DK_BTN3_MSK
 
-/** Main light output on DK_LED3 (onboard LED 2), driven by PWM when enabled. */
-#define APP_UI_LED_MAIN_LIGHT DK_LED3
+/** Main light output on DK_LED4 (onboard LED 3), driven by PWM when enabled. */
+#define APP_UI_LED_MAIN_LIGHT DK_LED4
 
 /** PWM devicetree node for the main light (board overlay: pwm-led1 alias). */
 #define APP_UI_PWM_LIGHT_NODE DT_ALIAS(pwm_led1)
