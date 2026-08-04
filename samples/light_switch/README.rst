@@ -116,6 +116,11 @@ User interface
 Sample-specific (light switch)
 ==============================
 
+LED 3:
+    **Zigbee active:** Solid on when the switch has found a controllable light bulb on the Zigbee network (Match Descriptor succeeded).
+    Off before a bulb is found.
+    **Matter active:** Off (not used).
+
 Button 1:
     Short press on the light switch (in addition to the protocol-switch long
     press described above):
@@ -123,14 +128,9 @@ Button 1:
     * **Zigbee active:** Starts Touchlink commissioning when ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is enabled (see :ref:`matter_zigbee_light_switch_touchlink`).
     * **Matter active:** Triggers ICD User Active Mode when ``CONFIG_CHIP_ICD_UAT_SUPPORT`` is enabled.
 
-LED 2:
-    **Zigbee active:** Solid on when the switch has found a controllable light bulb on the Zigbee network (Match Descriptor succeeded).
-    Off before a bulb is found.
-    **Matter active:** Off (not used).
-
 Button 2:
     **Both Matter and Zigbee:** Controls bound lights.
-    Available after **LED 2** turns on (Zigbee) or after Matter binding is set up (Matter).
+    Available after **LED 3** turns on (Zigbee) or after Matter binding is set up (Matter).
 
     * **Short press and release:** Toggle on/off.
     * **Press and hold (≥ 500 ms):** Dim up continuously while held.
@@ -171,7 +171,7 @@ After programming the sample to your development kits, complete the following st
 
    When **LED 1** turns on, the light switch has become an End Device, connected directly to the Coordinator.
 
-#. Wait until **LED 2** on the light switch node turns on.
+#. Wait until **LED 3** on the light switch node turns on.
 
    This LED indicates that the light switch found a light bulb to control.
 

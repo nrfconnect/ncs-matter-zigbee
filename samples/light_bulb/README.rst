@@ -106,12 +106,12 @@ User interface
 Sample-specific (light bulb)
 ============================
 
-LED 2:
+LED 3:
     **Both Matter and Zigbee:** Main light output (PWM when ``CONFIG_PWM`` is enabled).
     Reflects on/off and brightness from Zigbee Level Control / On/Off clusters or from Matter On/Off and Level Control clusters.
 
 Button 2:
-    **Matter active:** Short press toggles locally the main light (LED 2).
+    **Matter active:** Short press toggles locally the main light (LED 3).
     **Zigbee active:** Not used for light control (use the light switch or another Zigbee controller).
 
 Building and running
@@ -145,13 +145,13 @@ After programming the sample to your development kits, complete the following st
 
    When **LED 1** turns on, the light switch has become an End Device, connected directly to the Coordinator.
 
-#. Wait until **LED 2** on the development kit that runs the Light switch sample turns on.
+#. Wait until **LED 3** on the development kit that runs the Light switch sample turns on.
 
    This LED indicates that the switch found a light bulb to control.
 
 #. Use the buttons on the development kit that runs the :ref:`matter_zigbee_light_switch_sample` to control the light bulb.
 
-   The result of using the buttons is reflected on the light bulb's **LED 2**.
+   The result of using the buttons is reflected on the light bulb's **LED 3**.
 
 Testing the full Zigbee-to-Matter flow
 --------------------------------------
