@@ -38,6 +38,9 @@ extensions = [
     'page_filter',
     'ncs_matter_zigbee_kconfig',
     'options_from_kconfig',
+    'memory_data',
+    'memory_viz',
+    'stack_viz',
 ]
 
 root_doc = 'index'

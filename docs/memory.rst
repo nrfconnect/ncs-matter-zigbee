@@ -11,6 +11,7 @@ This page provides information about the amount of flash memory and RAM that is 
 Use it to check if your application has enough space for a given configuration.
 
 Unless stated otherwise, the default :file:`prj.conf` was used for debug builds, and :file:`matter_fota_release.conf` was added as an extra overlay for release builds.
+Sample variants match the Twister scenarios defined in each sample's :file:`sample.yaml` file.
 
 Memory layout in DTS
 ********************
@@ -56,42 +57,60 @@ See an example for the nRF54LM20 DK with external-flash FOTA in the :file:`board
 
    #include <nrf54lm20dk_cpuapp_partitions_ext_flash.dtsi>
 
-Sample memory requirements
-**************************
+RAM and flash memory requirements
+*********************************
 
-The following tables list memory requirements for the combined Matter and Zigbee samples.
+RAM and flash memory requirement values differ depending on the programmed sample.
+
+The following tables and bar charts list memory requirement values for the combined Matter and Zigbee samples.
 Values include the ZBOSS stack, Matter stack, MCUboot bootloader, and ZBOSS non-volatile regions where applicable.
+Each row corresponds to a Twister build scenario from :file:`samples/light_bulb/sample.yaml` or :file:`samples/light_switch/sample.yaml`.
+Scenarios not supported on a given board target are omitted from that board's view.
+
+Memory layout is taken from the DTS files used by each sample variant, while memory usage is taken from the build output.
+
+Values are provided in kilobytes (KB).
+Unsupported sample variants are omitted from each board view.
+``--`` indicates that a partition is not used by the sample configuration.
+
+Table columns are grouped by internal NVM, external NVM (when used), and RAM.
+Application, MCUboot, upgrade slot, and RAM cells show used and free space separated by ``/``.
+Other NVM columns list the reserved partition size for that region.
 
 .. tabs::
 
-   .. group-tab:: nRF54L15
+   .. group-tab:: Charts
 
-      The following table lists memory requirements for samples running on the `nrf54l15dk`_.
+      .. tabs::
 
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | Sample                                                                                                                 | ROM, ZBOSS stack + App   | ROM, MCUboot bootloader   | ROM, ZBOSS non-volatile memory   | ROM, ZBOSS product config   | Total ROM   | RAM, ZBOSS stack + App   | Total RAM   |
-      +========================================================================================================================+==========================+===========================+==================================+=============================+=============+==========================+=============+
-      | :ref:`Light bulb <matter_zigbee_light_bulb_sample>` (debug)                                                            | 1055                     | 56                        | 32                               | 4                           | 1147        | 228                      | 228         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | :ref:`Light bulb <matter_zigbee_light_bulb_sample>` (release)                                                          | 962                      | 56                        | 32                               | 4                           | 1054        | 228                      | 228         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | :ref:`Light switch <matter_zigbee_light_switch_sample>` (debug)                                                        | 927                      | 56                        | 32                               | 4                           | 1019        | 200                      | 200         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | :ref:`Light switch <matter_zigbee_light_switch_sample>` (release)                                                      | 834                      | 56                        | 32                               | 4                           | 926         | 200                      | 200         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
+         .. group-tab:: nRF54L15
 
-   .. group-tab:: nRF54LM20
+            Memory requirements for samples running on the `nrf54l15dk`_.
 
-      The following table lists memory requirements for samples running on the `nrf54lm20dk`_ with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
+            .. memory-board::
+               :board: nrf54l15
 
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | Sample                                                                                                                 | ROM, ZBOSS stack + App   | ROM, MCUboot bootloader   | ROM, ZBOSS non-volatile memory   | ROM, ZBOSS product config   | Total ROM   | RAM, ZBOSS stack + App   | Total RAM   |
-      +========================================================================================================================+==========================+===========================+==================================+=============================+=============+==========================+=============+
-      | :ref:`Light bulb <matter_zigbee_light_bulb_sample>` (debug)                                                            | 1070                     | 42                        | 32                               | 4                           | 1148        | 228                      | 228         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | :ref:`Light bulb <matter_zigbee_light_bulb_sample>` (release)                                                          | 979                      | 42                        | 32                               | 4                           | 1057        | 228                      | 228         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | :ref:`Light switch <matter_zigbee_light_switch_sample>` (debug)                                                        | 940                      | 42                        | 32                               | 4                           | 1018        | 201                      | 201         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
-      | :ref:`Light switch <matter_zigbee_light_switch_sample>` (release)                                                      | 849                      | 42                        | 32                               | 4                           | 927         | 201                      | 201         |
-      +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
+         .. group-tab:: nRF54LM20
+
+            Memory requirements for samples running on the `nrf54lm20dk`_ with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
+
+            .. memory-board::
+               :board: nrf54lm20
+
+   .. group-tab:: Tables
+
+      .. tabs::
+
+         .. group-tab:: nRF54L15
+
+            The following table lists memory requirements for samples running on the `nrf54l15dk`_.
+
+            .. memory-table::
+               :board: nrf54l15
+
+         .. group-tab:: nRF54LM20
+
+            The following table lists memory requirements for samples running on the `nrf54lm20dk`_ with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
+
+            .. memory-table::
+               :board: nrf54lm20
