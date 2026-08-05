@@ -1,0 +1,123 @@
+# Memory requirement data for nRF54LM20 DK.
+# Partition sizes are derived from dts/*.dtsi.
+# Sample usage values are taken from the existing memory requirements tables.
+# Variant rows are discovered from samples/*/sample.yaml Twister scenarios.
+
+board:
+  name: nRF54LM20 DK
+  nvm_total_kb: 2036
+  ram_total_kb: 511
+legend_threshold_kb: 4
+layouts:
+  base:
+    source: dts/nrf54lm20dk_cpuapp_partitions.dtsi
+    partitions:
+      - id: boot
+        label: MCUboot
+        size_kb: 40
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 1140
+        order: 1
+        offset: 40960
+      - id: slot1
+        label: Upgrade slot
+        size_kb: 768
+        order: 2
+        offset: 1208320
+      - id: factory_data
+        label: Factory data
+        size_kb: 4
+        order: 3
+        offset: 1994752
+      - id: storage
+        label: Storage
+        size_kb: 48
+        order: 4
+        offset: 1998848
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 32
+        order: 5
+        offset: 2048000
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 6
+        offset: 2080768
+        legend_only: true
+  ext_flash:
+    source: dts/nrf54lm20dk_cpuapp_partitions_ext_flash.dtsi
+    partitions:
+      - id: boot
+        label: MCUboot
+        size_kb: 56
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 1940
+        order: 1
+        offset: 57344
+      - id: factory_data
+        label: Factory data
+        size_kb: 4
+        order: 2
+        offset: 1994752
+      - id: storage
+        label: Storage
+        size_kb: 48
+        order: 3
+        offset: 1998848
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 32
+        order: 4
+        offset: 2048000
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 5
+        offset: 2080768
+        legend_only: true
+    external:
+      nvm_total_kb: 8192
+      partitions:
+        - id: slot1_ext
+          label: Upgrade slot (external)
+          size_kb: 1940
+          order: 0
+          offset: 0
+usage_by_test:
+  sample.matter_zigbee.light_bulb:
+    nvm:
+      boot: 42
+      slot0: 1070
+    ram_used_kb: 228
+  sample.matter_zigbee.light_bulb.int_flash:
+    nvm:
+      boot: 42
+      slot0: 1070
+    ram_used_kb: 228
+  sample.matter_zigbee.light_bulb.release:
+    nvm:
+      boot: 42
+      slot0: 979
+    ram_used_kb: 228
+  sample.matter_zigbee.light_switch:
+    nvm:
+      boot: 42
+      slot0: 940
+    ram_used_kb: 201
+  sample.matter_zigbee.light_switch.int_flash:
+    nvm:
+      boot: 42
+      slot0: 940
+    ram_used_kb: 201
+  sample.matter_zigbee.light_switch.release:
+    nvm:
+      boot: 42
+      slot0: 849
+    ram_used_kb: 201
