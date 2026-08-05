@@ -19,5 +19,5 @@ manifest:
     - name: ncs-zigbee
       remote: ncs
       repo-path: ncs-zigbee
-      revision: main
+      revision: v1.4.0
       path: ncs-zigbee
