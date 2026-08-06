@@ -1,0 +1,26 @@
+Over-the-air firmware upgrade
+-----------------------------
+
+You can update your device's firmware over the air using three methods.
+All three are enabled in the default sample configuration (:file:`prj.conf` and sysbuild).
+
+* Matter OTA – Updates your device through MCUboot, satisfying the Matter specification's requirement to support at least one over-the-air software update method.
+  Enable it with the ``SB_CONFIG_MATTER_OTA`` sysbuild Kconfig option, which sets ``CONFIG_CHIP_OTA_REQUESTOR`` on the application image.
+  Both options are enabled by default when building with sysbuild.
+
+* Zigbee FOTA – Updates your device over the Zigbee network using the ZCL OTA Upgrade cluster.
+  The downloaded image is applied through MCUboot.
+  Enable it with the ``CONFIG_ZIGBEE_FOTA`` Kconfig option.
+  Disabled by default in Kconfig; enabled in the default sample :file:`prj.conf`.
+  Available while Zigbee is the active protocol.
+
+* Device Firmware Upgrade (DFU) over Bluetooth LE – Updates your device using the `Simple Management Protocol`_ (SMP).
+  Enable it with the ``CONFIG_CHIP_DFU_OVER_BT_SMP`` Kconfig option.
+  Disabled by default in Kconfig; enabled in the default sample :file:`prj.conf`.
+
+Matter OTA, Zigbee FOTA, and SMP DFU are independent transports.
+SMP is not part of the Matter specification.
+Use `mcumgr`_ or `nRF Connect Device Manager`_ to perform SMP updates.
+For Zigbee FOTA, use an OTA Upgrade Server on the network, or see the `Zigbee FOTA library`_ documentation in the `Zigbee R23 add-on`_.
+
+For step-by-step instructions on testing the update process, see |sample bt dfu testing ref|.
