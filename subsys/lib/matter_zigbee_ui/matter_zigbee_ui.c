@@ -18,7 +18,9 @@
 #include <zboss_api.h>
 #include <zigbee/zigbee_app_utils.h>
 
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 
 LOG_MODULE_REGISTER(matter_zigbee_ui, CONFIG_MATTER_ZIGBEE_UI_LOG_LEVEL);
 
@@ -27,6 +29,8 @@ LOG_MODULE_REGISTER(matter_zigbee_ui, CONFIG_MATTER_ZIGBEE_UI_LOG_LEVEL);
 
 struct ui_led_blink_ctx {
 	struct k_timer timer;
+	struct k_work work;
+	uint8_t led;
 	uint32_t on_ms;
 	uint32_t off_ms;
 	bool active;
@@ -118,26 +122,38 @@ static void led_apply(uint8_t led, bool on)
 	(void)dk_set_led(led, on ? 1U : 0U);
 }
 
-static void led_blink_timer_handler(struct k_timer *timer)
+static void led_blink_work_handler(struct k_work *work)
 {
-	const uint8_t led = (uint8_t)(uintptr_t)k_timer_user_data_get(timer);
+	struct ui_led_blink_ctx *const ctx = CONTAINER_OF(work, struct ui_led_blink_ctx, work);
 
-	if (led >= MATTER_ZIGBEE_UI_MAX_LEDS || !s_blink[led].active) {
+	if (!ctx->active) {
 		return;
 	}
 
-	led_apply(led, !s_led_states[led]);
+	led_apply(ctx->led, !s_led_states[ctx->led]);
 
-	const uint32_t delay = s_led_states[led] ? s_blink[led].on_ms : s_blink[led].off_ms;
+	const uint32_t delay = s_led_states[ctx->led] ? ctx->on_ms : ctx->off_ms;
 
-	k_timer_start(timer, K_MSEC(delay), K_NO_WAIT);
+	k_timer_start(&ctx->timer, K_MSEC(delay), K_NO_WAIT);
+}
+
+static void led_blink_timer_handler(struct k_timer *timer)
+{
+	struct ui_led_blink_ctx *const ctx = CONTAINER_OF(timer, struct ui_led_blink_ctx, timer);
+
+	if (!ctx->active) {
+		return;
+	}
+
+	(void)k_work_submit(&ctx->work);
 }
 
 static void led_blink_timers_init(void)
 {
 	for (uint8_t led = 0; led < MATTER_ZIGBEE_UI_MAX_LEDS; led++) {
+		s_blink[led].led = led;
+		k_work_init(&s_blink[led].work, led_blink_work_handler);
 		k_timer_init(&s_blink[led].timer, led_blink_timer_handler, NULL);
-		k_timer_user_data_set(&s_blink[led].timer, (void *)(uintptr_t)led);
 	}
 }
 
@@ -251,6 +267,7 @@ void matter_zigbee_ui_led_blink_stop(uint8_t led)
 	}
 
 	k_timer_stop(&s_blink[led].timer);
+	(void)k_work_cancel(&s_blink[led].work);
 	s_blink[led].active = false;
 	s_blink[led].on_ms = 0U;
 	s_blink[led].off_ms = 0U;
