@@ -36,6 +36,12 @@ config MATTER_ZIGBEE_UI_SMP_DFU
 	help
 	  Enables button handling to start BT SMP DFU advertising.
 
+config MATTER_ZIGBEE_UI_DISABLE_LEDS
+	bool "Disable DK LEDs usage"
+	depends on DK_LIBRARY
+	help
+      Disable all DK LED indications in the application.
+
 module = MATTER_ZIGBEE_UI
 module-str = Matter/Zigbee UI
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
