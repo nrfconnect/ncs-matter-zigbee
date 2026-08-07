@@ -8,4 +8,11 @@ if MATTER_ZIGBEE_ADD_ON
 
 rsource "lib/Kconfig"
 
+
+config DISABLE_DK_LEDS
+	bool "Disable DK LEDs usage"
+	depends on DK_LIBRARY
+	help
+	  Enables LEDs module to be used in the application.
+
 endif

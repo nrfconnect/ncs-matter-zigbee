@@ -45,6 +45,10 @@ static bool s_zigbee_network_joined;
 
 static void zigbee_led_refresh(void)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	if (!protocol_is_zigbee_active()) {
 		matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_ZIGBEE);
 		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_ZIGBEE, false);
@@ -55,14 +59,17 @@ static void zigbee_led_refresh(void)
 		matter_zigbee_ui_led_blink_stop(MATTER_ZIGBEE_UI_LED_ZIGBEE);
 		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_ZIGBEE, true);
 	} else {
-		matter_zigbee_ui_led_blink(MATTER_ZIGBEE_UI_LED_ZIGBEE,
-					   MATTER_ZIGBEE_UI_ZIGBEE_NETWORK_BLINK_MS,
+		matter_zigbee_ui_led_blink(MATTER_ZIGBEE_UI_LED_ZIGBEE, MATTER_ZIGBEE_UI_ZIGBEE_NETWORK_BLINK_MS,
 					   MATTER_ZIGBEE_UI_ZIGBEE_NETWORK_BLINK_MS);
 	}
 }
 
 void matter_zigbee_ui_zigbee_led_update(uint8_t bufid)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	zb_zdo_app_signal_hdr_t *signal_header = NULL;
 	const zb_zdo_app_signal_type_t signal = zb_get_app_signal(bufid, &signal_header);
 	const zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
@@ -92,6 +99,10 @@ void matter_zigbee_ui_zigbee_led_update(uint8_t bufid)
 
 void matter_zigbee_ui_protocol_leds_refresh(void)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	matter_zigbee_ui_matter_status_refresh();
 	zigbee_led_refresh();
 
@@ -115,6 +126,10 @@ bool matter_zigbee_ui_consume_protocol_switch_short_release(void)
 
 static void led_apply(uint8_t led, bool on)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	if (led < MATTER_ZIGBEE_UI_MAX_LEDS) {
 		s_led_states[led] = on;
 	}
@@ -223,12 +238,20 @@ void matter_zigbee_ui_register(void)
 
 void matter_zigbee_ui_led_set(uint8_t led, bool on)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	matter_zigbee_ui_led_blink_stop(led);
 	led_apply(led, on);
 }
 
 bool matter_zigbee_ui_led_get(uint8_t led)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return false;
+#endif
+
 	if (led >= MATTER_ZIGBEE_UI_MAX_LEDS) {
 		return false;
 	}
@@ -238,11 +261,19 @@ bool matter_zigbee_ui_led_get(uint8_t led)
 
 void matter_zigbee_ui_led_toggle(uint8_t led)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	matter_zigbee_ui_led_set(led, !matter_zigbee_ui_led_get(led));
 }
 
 void matter_zigbee_ui_led_blink(uint8_t led, uint32_t on_ms, uint32_t off_ms)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	if (led >= MATTER_ZIGBEE_UI_MAX_LEDS || on_ms == 0U || off_ms == 0U) {
 		return;
 	}
@@ -262,6 +293,10 @@ void matter_zigbee_ui_led_blink(uint8_t led, uint32_t on_ms, uint32_t off_ms)
 
 void matter_zigbee_ui_led_blink_stop(uint8_t led)
 {
+#if defined(CONFIG_DISABLE_DK_LEDS)
+	return;
+#endif
+
 	if (led >= MATTER_ZIGBEE_UI_MAX_LEDS) {
 		return;
 	}
