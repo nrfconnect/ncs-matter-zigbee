@@ -42,9 +42,11 @@ K_SEM_DEFINE(leave_done_sem, 0, 1);
 
 atomic_t g_switch_press_active = ATOMIC_INIT(0);
 atomic_t g_matter_switch_pending_leave = ATOMIC_INIT(0);
+atomic_t g_switch_to_thread_pending = ATOMIC_INIT(0);
 
 void switch_to_thread_radio(void);
 void switch_to_zigbee_radio(void);
+void switch_to_thread_radio_work_handler(struct k_work *work);
 
 void matter_board_init_signal(void)
 {
@@ -107,6 +109,7 @@ void protocol_switch_work_handler(struct k_work *work)
 }
 
 K_WORK_DELAYABLE_DEFINE(protocol_switch_work, protocol_switch_work_handler);
+K_WORK_DEFINE(switch_to_thread_work, switch_to_thread_radio_work_handler);
 
 void zigbee_thread_fn()
 {
@@ -169,8 +172,15 @@ static void zboss_do_local_leave(zb_uint8_t param)
 	zb_bdb_reset_via_local_action(0);
 }
 
-void switch_to_thread_radio(void)
+void switch_to_thread_radio_work_handler(struct k_work *work)
 {
+	ARG_UNUSED(work);
+
+	if (protocol_state_get() != PROTOCOL_ZIGBEE) {
+		atomic_set(&g_switch_to_thread_pending, 0);
+		return;
+	}
+
 	/* Ask ZBOSS to send a clean NWK Leave frame so the coordinator removes
 	 * this device's unique TCLK.  We wait up to 5 s; after that we proceed
 	 * regardless (coordinator may be unreachable). */
@@ -188,17 +198,42 @@ void switch_to_thread_radio(void)
 	}
 	atomic_set(&g_matter_switch_pending_leave, 0);
 
-	k_thread_abort(zigbee_thread_id);
-	zigbee_deinit();
-
+	/* Stop sample timers from calling ZBOSS before the stack is suspended. */
 	protocol_state_set(PROTOCOL_MATTER);
-	LOG_INF("Protocol switched to Matter");
 	matter_zigbee_ui_protocol_leds_refresh();
+
+#ifdef CONFIG_ZIGBEE_DEBUG_FUNCTIONS
+	if (zigbee_is_stack_started()) {
+		zigbee_debug_suspend_zboss_thread();
+	}
+#else
+	zigbee_deinit();
+#endif
+
+	k_thread_abort(zigbee_thread_id);
+
+	LOG_INF("Protocol switched to Matter");
 
 	int ret = nrf_802154_callbacks_dispatcher_switch("openthread");
 	__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
 
 	start_thread_network_if_commissioned();
+	atomic_set(&g_switch_to_thread_pending, 0);
+}
+
+void switch_to_thread_radio(void)
+{
+	if (protocol_state_get() != PROTOCOL_ZIGBEE) {
+		return;
+	}
+
+	if (!atomic_cas(&g_switch_to_thread_pending, 0, 1)) {
+		return;
+	}
+
+	if (k_work_submit(&switch_to_thread_work) != 0) {
+		atomic_set(&g_switch_to_thread_pending, 0);
+	}
 }
 
 void switch_to_zigbee_radio(void)
