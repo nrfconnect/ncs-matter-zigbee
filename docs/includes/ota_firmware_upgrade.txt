@@ -10,7 +10,7 @@ You can update your device's firmware over the air using three methods.
 * Zigbee FOTA – Updates your device over the Zigbee network using the ZCL OTA Upgrade cluster.
   The downloaded image is applied through MCUboot.
   Enable it with the ``CONFIG_ZIGBEE_FOTA`` Kconfig option.
-  Disabled by default in Kconfig; enabled in the dedicated :file:`zigbee_fota.conf` extra conf file.
+  Disabled by default in Kconfig; enabled in the dedicated :file:`zigbee_fota.conf` extra configuration file.
   Available while Zigbee is the active protocol.
 
 * Device Firmware Upgrade (DFU) over Bluetooth LE – Updates your device using the `Simple Management Protocol`_ (SMP).

@@ -1,4 +1,4 @@
-.. _release_notes_vTBA:
+.. _release_notes_v100:
 
 Release notes for |addon| v1.0.0
 ################################
@@ -15,7 +15,7 @@ For the list of potential issues, see the :ref:`known_issues` page.
 Changelog
 *********
 
-This is the first `supported <Software maturity levels_>`_ release of the |addon|.
+This is the first `supported <software_maturity>`_ release of the |addon|.
 
 * Added:
 
@@ -25,4 +25,7 @@ This is the first `supported <Software maturity levels_>`_ release of the |addon
     While on Zigbee, Matter advertising can be enabled and the device can be commissioned by a Matter commissioner, performing protocol switch to Matter after successful commissioning.
   * The :ref:`matter_zigbee_light_switch_sample` and :ref:`matter_zigbee_light_bulb_sample` samples.
   * A snippet to support external flash usage for the samples.
-  * Support for DFU over Bluetooth LE SMP. This can be optionally enabled for the samples.
+  * Support for DFU over Bluetooth LE SMP.
+    This is enabled by default for the samples.
+  * Support for Zigbee FOTA.
+    This can be optionally enabled for the samples.

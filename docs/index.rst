@@ -6,9 +6,6 @@
 The |addon| for the |NCS| provides support for developing applications that use combined solution based on Matter and Zigbee technologies.
 This add-on requires the `Zigbee R23 add-on`_ and the `Matter`_ stack from the |NCS|.
 
-.. note::
-   The |addon| is provided at an `Software maturity levels`_ level of maturity.
-
 The add-on provides a platform design where Zigbee and Matter time-share the 802.15.4 radio on a single SoC.
 See :ref:`matter_zigbee_architectures` for the architecture overview and :ref:`matter_zigbee_samples` for sample applications.
 
@@ -22,5 +19,6 @@ See :ref:`matter_zigbee_architectures` for the architecture overview and :ref:`m
    memory
    config
    samples/index
+   software-maturity
    release_notes
    known_issues

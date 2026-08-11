@@ -59,10 +59,16 @@ When ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is enabled, the light switch can act 
 This lets the device commission directly with a nearby Touchlink target (for example, the :ref:`matter_zigbee_light_bulb_sample`) and form a distributed-security Zigbee network without a Zigbee Coordinator.
 
 Short-press **Button 1** during normal operation to start Touchlink commissioning.
+If the devices are not paired within 5–7 seconds, short-press **Button 1** once again.
 A long press on the same button switches protocol instead; see :ref:`matter_zigbee_limitations`.
 
 .. note::
    Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
+
+.. note::
+   Touchlink commissioning does not work reliably when the ``CONFIG_ZIGBEE_FOTA`` is enabled.
+   For testing Touchlink, it is recommended to disable Zigbee FOTA.
+   See :ref:`known_isses`_ and the `Zigbee R32 add-on known issues`_ for more details.
 
 .. _matter_zigbee_limitations:
 

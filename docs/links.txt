@@ -27,8 +27,10 @@
 
 .. _`Matter and Zigbee Add-on`: https://github.com/nrfconnect/ncs-matter-zigbee
 .. _`Zigbee R23 add-on`: https://github.com/nrfconnect/ncs-zigbee
-.. _`Zigbee Network Coordinator`: https://nrfconnectdocs.nordicsemi.com/addons/zigbee-r23/latest/samples/network_coordinator/README.html
-.. _`Zigbee FOTA library`: https://nrfconnectdocs.nordicsemi.com/addons/zigbee-r23/latest/lib/zigbee_fota.html
+.. _`Zigbee Network Coordinator`: https://nrfconnectdocs.nordicsemi.com/addons/ncs-zigbee/latest/samples/network_coordinator/README.html
+.. _`Zigbee FOTA library`: https://nrfconnectdocs.nordicsemi.com/addons/ncs-zigbee/latest/lib/zigbee_fota.html
+.. _`Zigbee R32 add-on known issues`: https://nrfconnectdocs.nordicsemi.com/addons/ncs-zigbee/latest/known_issues.html
+.. _`nRF Connect SDK known issues`: https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/releases_and_maturity/known_issues.html
 
 .. ### nrfxlib documentation set
 
