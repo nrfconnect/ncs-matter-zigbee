@@ -55,10 +55,9 @@ config LIGHT_SWITCH_TX_POWER
 	help
 		TX power level in dBm.
 
-config LIGHT_SWITCH_LOW_POWER
-	bool "Low power mode"
+config LIGHT_SWITCH_ZIGBEE_SLEEPY
+	bool "Zigbee Sleepy End Device"
 	default y
-	depends on PM_DEVICE
 	help
-		Enable low power mode for the Light Switch sample.
-		This enables sleepy behavior and disables LEDs for power savings.
+		Configure the Zigbee End Device as a Sleepy End Device
+		(receiver off when idle, polling its parent for traffic).

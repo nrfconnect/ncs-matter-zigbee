@@ -17,7 +17,7 @@ All samples are placed in the :file:`samples` directory in the |addon| repositor
      - Thread role
      - Zigbee Touchlink
    * - :ref:`matter_zigbee_light_switch_sample`
-     - Zigbee End Device
+     - Zigbee Sleepy End Device
      - Zigbee Dimmer Switch
      - Matter Dimmer Switch
      - Sleepy End Device
