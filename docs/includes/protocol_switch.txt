@@ -9,6 +9,10 @@ From Zigbee, the coexistence layer stops the ZBOSS stack and hands the 802.15.4 
 From Matter, the device persists Zigbee as the active protocol and reboots.
 The protocol switch is ignored while the device is joining a Zigbee network or undergoing Matter commissioning.
 
+Switching protocols does not discard network credentials.
+A device that is switched back to a previously commissioned protocol rejoins the same network.
+Only a factory reset clears credentials.
+
 Integrating the coexistence layer in ``AppTask::Init()`` requires two call sites:
 
 1. Pass ``matter_zigbee_coexistence_pre_server_init`` as ``mPreServerInitClbk`` in ``Nrf::Matter::InitData`` before calling ``Nrf::Matter::PrepareServer()``.

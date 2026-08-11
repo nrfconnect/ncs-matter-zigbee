@@ -30,8 +30,6 @@
 extern "C" {
 #endif
 
-#include <zboss_api.h>
-
 /** @brief Callbacks supplied by the sample. */
 struct matter_zigbee_coexistence_callbacks {
 	/** Start the Matter application. Invoked from the Matter worker
@@ -119,21 +117,6 @@ void matter_zigbee_coexistence_pre_server_init(void);
  */
 bool matter_zigbee_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
 						     uint32_t switch_button);
-
-/** @brief Forward selected ZBOSS application signals to the coexistence runtime.
- *
- * Call from the application's @c zboss_signal_handler before
- * @ref zigbee_default_signal_handler.  When @p bufid carries a successful
- * @c ZB_ZDO_SIGNAL_LEAVE with leave_type @c ZB_NWK_LEAVE_TYPE_RESET, a
- * pending Matter protocol switch is unblocked so the radio hand-over to
- * OpenThread can proceed.
- *
- * Safe to call unconditionally for any signal buffer; it is a no-op for
- * unrelated signals and when no switch is pending.
- *
- * @param bufid ZBOSS application signal buffer, or @c 0 if invalid.
- */
-void matter_zigbee_coexistence_handle_zboss_signal(zb_bufid_t bufid);
 
 #ifdef __cplusplus
 }

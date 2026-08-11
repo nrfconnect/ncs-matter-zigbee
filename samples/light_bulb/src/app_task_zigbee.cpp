@@ -503,10 +503,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	zigbee_touchlink_target_signal_handler(bufid);
 #endif
 
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE
-	matter_zigbee_coexistence_handle_zboss_signal(bufid);
-#endif
-
 	ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
 
 	/* All callbacks should either reuse or free passed buffers.

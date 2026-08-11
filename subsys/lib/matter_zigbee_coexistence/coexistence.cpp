@@ -40,10 +40,8 @@ namespace
 const struct matter_zigbee_coexistence_callbacks *g_cb;
 
 K_SEM_DEFINE(matter_init_done_sem, 0, 1);
-K_SEM_DEFINE(leave_done_sem, 0, 1);
 
 atomic_t g_switch_press_active = ATOMIC_INIT(0);
-atomic_t g_matter_switch_pending_leave = ATOMIC_INIT(0);
 atomic_t g_switch_to_thread_pending = ATOMIC_INIT(0);
 
 void switch_to_thread_radio(void);
@@ -180,16 +178,6 @@ K_THREAD_DEFINE(zigbee_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD
 K_THREAD_DEFINE(matter_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_STACK_SIZE, matter_thread_fn, NULL,
 		NULL, NULL, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
-static void zboss_do_local_leave(zb_uint8_t param)
-{
-	ZVUNUSED(param);
-	/* Sends a NWK Leave frame (notifying the coordinator to remove this
-	 * device from its tables, including the unique TCLK) and then erases
-	 * ZBOSS NVRAM.  The ZB_ZDO_SIGNAL_LEAVE signal fires when done, which
-	 * is forwarded via matter_zigbee_coexistence_handle_zboss_signal(). */
-	zb_bdb_reset_via_local_action(0);
-}
-
 void switch_to_thread_radio_work_handler(struct k_work *work)
 {
 	ARG_UNUSED(work);
@@ -199,40 +187,15 @@ void switch_to_thread_radio_work_handler(struct k_work *work)
 		return;
 	}
 
-	/* Ask ZBOSS to send a clean NWK Leave frame so the coordinator removes
-	 * this device's unique TCLK.  We wait up to 5 s; after that we proceed
-	 * regardless (coordinator may be unreachable). */
-	atomic_set(&g_matter_switch_pending_leave, 1);
-	k_sem_reset(&leave_done_sem);
-	zb_ret_t zb_ret = zigbee_schedule_callback(zboss_do_local_leave, 0);
-	if (zb_ret == RET_OK) {
-		if (k_sem_take(&leave_done_sem, K_SECONDS(5)) != 0) {
-			LOG_WRN("Leave confirmation not received within timeout; "
-				"coordinator may be unreachable");
-			k_sem_reset(&leave_done_sem);
-		}
-	} else {
-		LOG_WRN("Failed to schedule ZBOSS leave callback (%d), proceeding without leave", zb_ret);
-	}
-	atomic_set(&g_matter_switch_pending_leave, 0);
-
-	/* Stop sample timers from calling ZBOSS before the stack is suspended. */
+	/*
+	 * Park the Zigbee stack without leaving the network.
+	 */
 	k_thread_abort(zigbee_thread_id);
 	zigbee_deinit();
 	release_zboss_tick_source();
 
 	protocol_state_set(PROTOCOL_MATTER);
 	matter_zigbee_ui_protocol_leds_refresh();
-
-#ifdef CONFIG_ZIGBEE_DEBUG_FUNCTIONS
-	if (zigbee_is_stack_started()) {
-		zigbee_debug_suspend_zboss_thread();
-	}
-#else
-	zigbee_deinit();
-#endif
-
-	k_thread_abort(zigbee_thread_id);
 
 	LOG_INF("Protocol switched to Matter");
 
@@ -409,34 +372,6 @@ extern "C" int matter_zigbee_coexistence_run(const struct matter_zigbee_coexiste
 	k_thread_start(matter_thread_id);
 
 	return 0;
-}
-
-static void on_zboss_leave_signal(void)
-{
-	if (atomic_get(&g_matter_switch_pending_leave)) {
-		k_sem_give(&leave_done_sem);
-	}
-}
-
-extern "C" void matter_zigbee_coexistence_handle_zboss_signal(zb_bufid_t bufid)
-{
-	if (!bufid) {
-		return;
-	}
-
-	zb_zdo_app_signal_hdr_t *sig_handler = nullptr;
-	const zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, &sig_handler);
-
-	if (sig != ZB_ZDO_SIGNAL_LEAVE || ZB_GET_APP_SIGNAL_STATUS(bufid) != RET_OK) {
-		return;
-	}
-
-	zb_zdo_signal_leave_params_t *const leave_params =
-		ZB_ZDO_SIGNAL_GET_PARAMS(sig_handler, zb_zdo_signal_leave_params_t);
-
-	if (leave_params->leave_type == ZB_NWK_LEAVE_TYPE_RESET) {
-		on_zboss_leave_signal();
-	}
 }
 
 extern "C" bool matter_zigbee_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
