@@ -77,8 +77,10 @@
  */
 #define ERASE_PERSISTENT_CONFIG ZB_FALSE
 
-/* Dim step size - increases/decreases current level (range 0x000 - 0xfe). */
+/* Dim step size - increases/decreases current level (range 0x00 - 0xfe). */
 #define DIMM_STEP 15
+#define DIMM_LEVEL_MIN 0x00
+#define DIMM_LEVEL_MAX 0xFE
 
 /* Transition time for a single step operation in 0.1 sec units.
  * 0xFFFF - immediate change.
@@ -101,6 +103,7 @@ struct buttons_context {
 	uint32_t state;
 	atomic_t long_poll;
 	struct k_timer alarm;
+	zb_uint8_t dimm_level;
 };
 
 struct zb_device_ctx {
@@ -162,6 +165,7 @@ static void light_switch_button_handler(struct k_timer *timer);
 static void find_light_bulb_alarm(struct k_timer *timer);
 static void find_light_bulb(zb_bufid_t bufid);
 static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t on_off);
+static void light_switch_send_move_to_level(zb_bufid_t bufid, zb_uint16_t level);
 
 /**@brief Starts identifying the device.
  *
@@ -387,6 +391,7 @@ static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
 			       NULL);
 }
 
+#if CONFIG_BT_NUS
 /**@brief Function for sending step requests to the light bulb.
  *
  * @param[in]   bufid        Non-zero reference to Zigbee stack buffer that
@@ -401,6 +406,21 @@ static void light_switch_send_step(zb_bufid_t bufid, zb_uint16_t cmd_id)
 					   bulb_ctx.endpoint, LIGHT_SWITCH_ENDPOINT, ZB_AF_HA_PROFILE_ID,
 					   ZB_ZCL_DISABLE_DEFAULT_RESPONSE, NULL, cmd_id, DIMM_STEP,
 					   DIMM_TRANSACTION_TIME);
+}
+#endif /* CONFIG_BT_NUS */
+
+/**@brief Function for sending a move-to-level request to the light bulb.
+ *
+ * @param[in]   bufid   Non-zero reference to the Zigbee stack buffer.
+ * @param[in]   level   Target brightness level.
+ */
+static void light_switch_send_move_to_level(zb_bufid_t bufid, zb_uint16_t level)
+{
+	LOG_INF("Send move to level command: %d", level);
+
+	ZB_ZCL_LEVEL_CONTROL_SEND_MOVE_TO_LEVEL_WITH_ON_OFF_REQ(
+		bufid, bulb_ctx.short_addr, ZB_APS_ADDR_MODE_16_ENDP_PRESENT, bulb_ctx.endpoint, LIGHT_SWITCH_ENDPOINT,
+		ZB_AF_HA_PROFILE_ID, ZB_ZCL_DISABLE_DEFAULT_RESPONSE, NULL, level, DIMM_TRANSACTION_TIME);
 }
 
 /**@brief Callback function receiving finding procedure results.
@@ -504,16 +524,21 @@ static void find_light_bulb(zb_bufid_t bufid)
 static void light_switch_button_handler(struct k_timer *timer)
 {
 	zb_ret_t zb_err_code;
-	zb_uint16_t cmd_id;
+	zb_uint16_t next_level;
 
 	if (dk_get_buttons() & buttons_ctx.state) {
 		atomic_set(&buttons_ctx.long_poll, ZB_TRUE);
-		cmd_id = ZB_ZCL_LEVEL_CONTROL_STEP_MODE_UP;
+		next_level = buttons_ctx.dimm_level + DIMM_STEP;
+		if (next_level > DIMM_LEVEL_MAX) {
+			next_level = DIMM_LEVEL_MIN;
+		}
 
-		/* Allocate output buffer and send step command. */
-		zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_step, cmd_id, 0);
+		/* Allocate output buffer and send the next absolute level. */
+		zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_move_to_level, next_level, 0);
 		if (zb_err_code != RET_OK) {
 			LOG_ERR("Failed to schedule buffer allocation: %d", zb_err_code);
+		} else {
+			buttons_ctx.dimm_level = next_level;
 		}
 
 		k_timer_start(&buttons_ctx.alarm, APP_UI_BUTTON_ZIGBEE_LONG_PRESS_TIMEOUT, K_NO_WAIT);
