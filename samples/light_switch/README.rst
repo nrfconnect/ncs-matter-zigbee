@@ -156,7 +156,9 @@ Button 2:
     Available after **LED 3** turns on (Zigbee) or after Matter binding is set up (Matter).
 
     * **Short press and release:** Toggle on/off.
-    * **Press and hold (≥ 500 ms):** Dim up continuously while held.
+    * **Press and hold (≥ 500 ms):** Increase the level by 15 every 500 ms while held,
+      turning the light on if needed and wrapping to the minimum level after reaching
+      the maximum.
       Releasing after dimming does not toggle.
 
 Building and running
