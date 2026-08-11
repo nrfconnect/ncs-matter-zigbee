@@ -24,8 +24,10 @@
 
 extern "C" {
 #include <zb_nrf_platform.h>
+#include <zb_osif_platform.h>
 }
 
+#include <ram_pwrdn.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/reboot.h>
@@ -51,6 +53,11 @@ void switch_to_thread_radio_work_handler(struct k_work *work);
 void matter_board_init_signal(void)
 {
 	k_sem_give(&matter_init_done_sem);
+}
+
+void release_zboss_tick_source(void)
+{
+	zb_osif_timer_stop();
 }
 
 void start_thread_network_if_commissioned(void)
@@ -126,6 +133,13 @@ void zigbee_thread_fn()
 	if (protocol_state_get() == PROTOCOL_MATTER) {
 		LOG_INF("Persisted protocol is Matter; skipping Zigbee and handing radio to Thread");
 
+		/*
+		 * ZBOSS is unused during Matter operation.
+		 * Its clock is therefore not handled. Without disabling it here,
+		 * power consumption during sleep is increased by ~100 uA.
+		 */
+		release_zboss_tick_source();
+
 		ret = nrf_802154_callbacks_dispatcher_switch("openthread");
 		__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
 
@@ -134,6 +148,10 @@ void zigbee_thread_fn()
 		start_thread_network_if_commissioned();
 		if (g_cb->post_matter_ui_init != NULL) {
 			g_cb->post_matter_ui_init();
+		}
+
+		if (IS_ENABLED(CONFIG_RAM_POWER_DOWN_LIBRARY)) {
+			power_down_unused_ram();
 		}
 		return;
 	}
@@ -199,6 +217,10 @@ void switch_to_thread_radio_work_handler(struct k_work *work)
 	atomic_set(&g_matter_switch_pending_leave, 0);
 
 	/* Stop sample timers from calling ZBOSS before the stack is suspended. */
+	k_thread_abort(zigbee_thread_id);
+	zigbee_deinit();
+	release_zboss_tick_source();
+
 	protocol_state_set(PROTOCOL_MATTER);
 	matter_zigbee_ui_protocol_leds_refresh();
 

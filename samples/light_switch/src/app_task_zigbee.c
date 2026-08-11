@@ -91,36 +91,6 @@
 
 LOG_MODULE_REGISTER(zb_lightswitch, LOG_LEVEL_INF);
 
-/* Helper functions for LED control in low power mode */
-#if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
-static inline void led_set(uint32_t led, uint32_t val)
-{
-	ARG_UNUSED(led);
-	ARG_UNUSED(val);
-}
-static inline void led_set_on(uint32_t led)
-{
-	ARG_UNUSED(led);
-}
-static inline void led_set_off(uint32_t led)
-{
-	ARG_UNUSED(led);
-}
-#else
-static inline void led_set(uint32_t led, uint32_t val)
-{
-	matter_zigbee_ui_led_set(led, val != 0U);
-}
-static inline void led_set_on(uint32_t led)
-{
-	matter_zigbee_ui_led_set(led, true);
-}
-static inline void led_set_off(uint32_t led)
-{
-	matter_zigbee_ui_led_set(led, false);
-}
-#endif
-
 struct bulb_context {
 	zb_uint8_t endpoint;
 	zb_uint16_t short_addr;
@@ -378,7 +348,7 @@ static void toggle_identify_led(zb_bufid_t bufid)
 {
 	static int blink_status;
 
-	led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, (++blink_status) % 2);
+	matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, (++blink_status) % 2 != 0);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -398,7 +368,7 @@ static void identify_cb(zb_bufid_t bufid)
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
 
-		led_set_off(MATTER_ZIGBEE_UI_LED_IDENTIFY);
+		matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, false);
 	}
 }
 
@@ -461,7 +431,7 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
 		LOG_INF("Found bulb addr: %d ep: %d", bulb_ctx.short_addr, bulb_ctx.endpoint);
 
 		k_timer_stop(&bulb_ctx.find_alarm);
-		led_set_on(APP_UI_LED_ZIGBEE_BULB_FOUND);
+		matter_zigbee_ui_led_set(APP_UI_LED_ZIGBEE_BULB_FOUND, true);
 	} else if (bulb_ctx.short_addr != 0xFFFF) {
 		LOG_DBG("Match descriptor response ignored (bulb already selected)");
 	} else if ((resp->status != ZB_ZDP_STATUS_SUCCESS) || (resp->match_len == 0)) {
@@ -837,18 +807,7 @@ int ZigbeeStart(void)
 	/* Set default bulb short_addr. */
 	bulb_ctx.short_addr = 0xFFFF;
 
-	/* Check if sleepy button is pressed during Zigbee initialization
-	 * and enable sleepy behavior. In low power mode, always enable sleepy behavior.
-	 */
-#if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
-	bool enable_sleepy = true;
-#elif defined(CONFIG_CHIP)
-	bool enable_sleepy = false;
-#else
-	bool enable_sleepy = (dk_get_buttons() & APP_UI_BUTTON_ZIGBEE_SLEEPY) ? true : false;
-#endif
-
-	if (enable_sleepy) {
+	if (IS_ENABLED(CONFIG_LIGHT_SWITCH_ZIGBEE_SLEEPY)) {
 		zigbee_configure_sleepy_behavior(true);
 	}
 

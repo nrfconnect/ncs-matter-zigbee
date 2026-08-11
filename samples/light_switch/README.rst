@@ -13,7 +13,8 @@ It implements a Zigbee Dimmer Switch (End Device) and a Matter Dimmer Switch tha
 You can use it together with the Network coordinator and Light bulb samples from the `Zigbee R23 add-on`_ to set up a basic Zigbee network, or pair it directly with the :ref:`matter_zigbee_light_bulb_sample` using Touchlink commissioning.
 
 The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the :file:`matter_zigbee_coexistence` library.
-For Thread networking in Matter mode, the light switch acts as an OpenThread Minimal Thread Device (MTD).
+The Light switch is a sleepy device in both protocols: a Zigbee Sleepy End Device when Zigbee is active, and an OpenThread Minimal Thread Device (MTD) when Matter is active.
+See `Low power operation`_ for the related configuration options.
 
 Requirements
 ************
@@ -38,7 +39,7 @@ At this point, you can start using the buttons on the development kit to control
 
 Protocol selection is time-separated and persisted across reboots:
 
-* On first boot, the device starts on the protocol selected by :option:`CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL` (Zigbee by default) and behaves as a standard Zigbee End Device (Dimmer Switch) when Zigbee is active.
+* On first boot, the device starts on the protocol selected by :option:`CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL` (Zigbee by default) and behaves as a standard Zigbee sleepy End Device (Dimmer Switch) when Zigbee is active.
   In parallel, the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE) for the duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` (60 s by default).
 * When a Matter commissioner completes commissioning (first CASE session established while Thread is not yet attached), the coexistence layer stops the Zigbee stack, hands the radio over to OpenThread, and persists the selected protocol.
   From this point on, the device operates as a Matter Dimmer Switch that controls remote Matter lights through the client-side binding cluster.
@@ -112,6 +113,22 @@ For the board name to use instead of the ``board_target``, see `Programming boar
 See `Providing CMake options`_ in the |NCS| documentation for instructions on how to add flags to your build.
 For more information about configuration files in the |NCS|, see `Build and configuration system`_ in the |NCS| documentation.
 
+Low power operation
+===================
+
+The light switch is a sleepy device:
+
+* When Zigbee is active, the device can be configured as a Sleepy End Device using the ``CONFIG_LIGHT_SWITCH_ZIGBEE_SLEEPY`` Kconfig option (enabled by default).
+* When Matter is active, the device is a Thread Minimal Thread Device with Intermittently Connected Device support.
+
+For low power operation, use the :file:`matter_fota_release.conf` overlay described in :ref:`matter_zigbee_light_switch_build_variants`.
+In addition to stripping logging, the console, and the shell, it enables ``CONFIG_PM_DEVICE`` and ``CONFIG_PM_DEVICE_RUNTIME`` to suspend idle peripherals.
+For additional power savings, disable all DK LED indications with ``CONFIG_MATTER_ZIGBEE_UI_DISABLE_LEDS``.
+
+.. note::
+   While Zigbee is active, the Matter stack advertises for commissioning over Bluetooth LE as described in the `Overview`_ section.
+   During Zigbee operation the power consumption is increased until the advertising duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` elapses.
+
 .. _matter_zigbee_light_switch_user_interface:
 
 User interface
@@ -141,10 +158,6 @@ Button 2:
     * **Short press and release:** Toggle on/off.
     * **Press and hold (≥ 500 ms):** Dim up continuously while held.
       Releasing after dimming does not toggle.
-
-    **Zigbee only — boot option:** Hold Button 2 while the device boots to
-    enable sleepy End Device behavior (see sample Kconfig help for low-power
-    variants).
 
 Building and running
 ********************
