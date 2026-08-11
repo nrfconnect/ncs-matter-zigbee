@@ -621,10 +621,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	zigbee_fota_signal_handler(bufid);
 #endif /* CONFIG_ZIGBEE_FOTA */
 
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE
-	matter_zigbee_coexistence_handle_zboss_signal(bufid);
-#endif
-
 	switch (sig) {
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 	case ZB_BDB_SIGNAL_STEERING_CANCELLED:
