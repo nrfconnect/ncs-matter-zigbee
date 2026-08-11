@@ -10,7 +10,7 @@ from pathlib import Path
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Matter and Zigbee coexistence add-on for nRF Connect SDK'
+project = 'Matter and Zigbee add-on for nRF Connect SDK'
 copyright = '2026, Nordic Semiconductor'
 author = 'Nordic Semiconductor'
 release = '1.0.0'

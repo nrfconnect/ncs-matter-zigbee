@@ -57,6 +57,11 @@ The device responds to Touchlink scans whenever it is powered and not yet joined
 .. note::
    Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
 
+.. note::
+   Touchlink commissioning does not work reliably when the ``CONFIG_ZIGBEE_FOTA`` is enabled.
+   For testing Touchlink, it is recommended to disable Zigbee FOTA.
+   See :ref:`known_isses`_ and the `Zigbee R32 add-on known issues`_ for more details.
+
 Limitations
 ===========
 
