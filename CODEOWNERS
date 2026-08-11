@@ -1,1 +1,3 @@
 * @nrfconnect/ncs-zigbee @nrfconnect/ncs-matter
+*.rst @peknis @annwoj
+*.txt @peknis @annwoj
