@@ -42,14 +42,14 @@ def _extra_args(test: dict[str, Any], common: dict[str, Any]) -> list[str]:
 
 
 def _layout(extra_args: list[str]) -> str:
-    if any("matter_fota_ext_flash" in arg for arg in extra_args):
+    if any("ext_flash" in arg for arg in extra_args):
         return "ext_flash"
     return "base"
 
 
 def _suffix(test_id: str, extra_args: list[str]) -> str:
     joined = " ".join(extra_args)
-    if "matter_fota_release.conf" in joined:
+    if "release.conf" in joined:
         return " (release)"
     if test_id.endswith(".int_flash"):
         return " (internal flash)"

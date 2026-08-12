@@ -10,7 +10,7 @@ Memory requirements
 This page provides information about the amount of flash memory and RAM that is required by the :ref:`matter_zigbee_samples`.
 Use it to check if your application has enough space for a given configuration.
 
-Unless stated otherwise, the default :file:`prj.conf` was used for debug builds, and :file:`matter_fota_release.conf` was added as an extra overlay for release builds.
+Unless stated otherwise, the default :file:`prj.conf` was used for debug builds, and :file:`release.conf` was added as an extra overlay for release builds.
 Sample variants match the Twister scenarios defined in each sample's :file:`sample.yaml` file.
 
 Memory layout in DTS
@@ -47,7 +47,7 @@ The following table lists the available files, which targets they cover, and whe
      - | nRF54L15 DK (DK only)
        | nRF54LM20 DK (DK only)
      - Same as the internal layout, but places ``slot1_partition`` on external flash and enlarges ``slot0_partition``.
-       Build with ``SNIPPET=matter_fota_ext_flash``.
+       Build with ``SNIPPET=ext_flash``.
 
 To add an overlay file to your application, add an ``#include`` line to :file:`app.overlay` or to a board overlay in :file:`boards/`.
 

@@ -12,7 +12,7 @@ tests:
     sysbuild: true
     build_only: true
     extra_args:
-      - SNIPPET=matter_fota_ext_flash
+      - SNIPPET=ext_flash
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
@@ -32,8 +32,8 @@ tests:
     sysbuild: true
     build_only: true
     extra_args:
-      - SNIPPET=matter_fota_ext_flash
-      - EXTRA_CONF_FILE=matter_fota_release.conf
+      - SNIPPET=ext_flash
+      - EXTRA_CONF_FILE=release.conf
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
@@ -44,7 +44,7 @@ tests:
     sysbuild: true
     build_only: true
     extra_args:
-      - SNIPPET=matter_fota_ext_flash
+      - SNIPPET=ext_flash
       - CONFIG_ZIGBEE_TOUCHLINK_TARGET=y
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
@@ -56,7 +56,7 @@ tests:
     sysbuild: true
     build_only: true
     extra_args:
-      - SNIPPET=matter_fota_ext_flash
+      - SNIPPET=ext_flash
       - EXTRA_CONF_FILE=zigbee_fota.conf
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
