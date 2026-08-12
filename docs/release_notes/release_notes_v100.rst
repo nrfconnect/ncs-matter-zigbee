@@ -16,6 +16,7 @@ Changelog
 *********
 
 This is the first `supported <software_maturity>`_ release of the |addon|.
+For a full overview of supported features, see :ref:`software_maturity` page.
 
 * Added:
 
@@ -25,7 +26,7 @@ This is the first `supported <software_maturity>`_ release of the |addon|.
     While on Zigbee, Matter advertising can be enabled and the device can be commissioned by a Matter commissioner, performing protocol switch to Matter after successful commissioning.
   * The :ref:`matter_zigbee_light_switch_sample` and :ref:`matter_zigbee_light_bulb_sample` samples.
   * A snippet to support external flash usage for the samples.
-  * Support for DFU over Bluetooth LE SMP.
-    This is enabled by default for the samples.
-  * Support for Zigbee FOTA.
-    This can be optionally enabled for the samples.
+  * Support for Device Firmware Update (DFU) over Bluetooth LE `Simple Management Protocol`_ (SMP).
+    This option is enabled by default for samples.
+  * Support for Zigbee Firmware Over-the-Air (FOTA).
+    You can enable it for samples.
