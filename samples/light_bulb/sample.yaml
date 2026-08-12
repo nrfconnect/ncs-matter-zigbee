@@ -52,3 +52,15 @@ tests:
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
       - no_integration
+  sample.matter_zigbee.light_bulb.zigbee_fota:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - SNIPPET=matter_fota_ext_flash
+      - EXTRA_CONF_FILE=zigbee_fota.conf
+    platform_allow:
+      - nrf54l15dk/nrf54l15/cpuapp
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+      - nrf54lm20dk/nrf54lm20b/cpuapp
+    tags:
+      - no_integration
