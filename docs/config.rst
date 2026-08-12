@@ -10,7 +10,6 @@ Configuration options
 This page lists the Kconfig options provided by the |addon|.
 
 |config|
-|kconfig_search|
 
 .. _ncs_matter_zigbee_kconfig:
 

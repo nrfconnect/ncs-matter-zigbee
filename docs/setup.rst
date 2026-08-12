@@ -106,4 +106,3 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
             This means that the current workspace is using the nRF Connect SDK.
 
 |config|
-|kconfig_search|
