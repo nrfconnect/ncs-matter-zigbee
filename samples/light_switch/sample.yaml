@@ -64,12 +64,11 @@ tests:
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
       - no_integration
-  sample.matter_zigbee.light_switch.touchlink.power_consumption_testing:
+  sample.matter_zigbee.light_switch.power_consumption_testing:
     sysbuild: true
     build_only: true
     extra_args:
       - SNIPPET=ext_flash
-      - CONFIG_ZIGBEE_TOUCHLINK_INITIATOR=y
       - EXTRA_CONF_FILE=release.conf
       - CONFIG_MATTER_ZIGBEE_UI_DISABLE_LEDS=y
     platform_allow:

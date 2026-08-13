@@ -57,7 +57,13 @@ config LIGHT_SWITCH_TX_POWER
 
 config LIGHT_SWITCH_ZIGBEE_SLEEPY
 	bool "Zigbee Sleepy End Device"
+	depends on !ZIGBEE_TOUCHLINK_INITIATOR
 	default y
 	help
 		Configure the Zigbee End Device as a Sleepy End Device
 		(receiver off when idle, polling its parent for traffic).
+
+		This option cannot be enabled together with
+		CONFIG_ZIGBEE_TOUCHLINK_INITIATOR. Touchlink commissioning requires
+		the radio receiver to stay active for inter-PAN traffic, which is
+		incompatible with sleepy End Device behavior.
