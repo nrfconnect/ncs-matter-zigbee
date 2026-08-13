@@ -13,7 +13,11 @@ It implements a Zigbee Dimmer Switch (End Device) and a Matter Dimmer Switch tha
 You can use it together with the Network coordinator and Light bulb samples from the `Zigbee R23 add-on`_ to set up a basic Zigbee network, or pair it directly with the :ref:`matter_zigbee_light_bulb_sample` using Touchlink commissioning.
 
 The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the :file:`matter_zigbee_coexistence` library.
-The Light switch is a sleepy device in both protocols: a Zigbee Sleepy End Device when Zigbee is active, and an OpenThread Minimal Thread Device (MTD) when Matter is active.
+The Light switch is a sleepy device in both protocols:
+
+* A Zigbee Sleepy End Device when Zigbee is active.
+* An OpenThread Minimal Thread Device (MTD) when Matter is active.
+
 See `Low power operation`_ for the related configuration options.
 
 Requirements
@@ -39,7 +43,7 @@ At this point, you can start using the buttons on the development kit to control
 
 Protocol selection is time-separated and persisted across reboots:
 
-* On first boot, the device starts on the protocol selected by :option:`CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL` (Zigbee by default) and behaves as a standard Zigbee sleepy End Device (Dimmer Switch) when Zigbee is active.
+* On first boot, the device starts on the protocol selected by the ``CONFIG_MATTER_ZIGBEE_PROTOCOL_STATE_DEFAULT_PROTOCOL`` Kconfig option (Zigbee by default) and behaves as a Zigbee End Device (Dimmer Switch, sleepy when ``CONFIG_LIGHT_SWITCH_ZIGBEE_SLEEPY`` is enabled) when Zigbee is active.
   In parallel, the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE) for the duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` (60 s by default).
 * When a Matter commissioner completes commissioning (first CASE session established while Thread is not yet attached), the coexistence layer stops the Zigbee stack, hands the radio over to OpenThread, and persists the selected protocol.
   From this point on, the device operates as a Matter Dimmer Switch that controls remote Matter lights through the client-side binding cluster.
@@ -65,6 +69,11 @@ A long press on the same button switches protocol instead; see :ref:`matter_zigb
 
 .. note::
    Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
+
+.. note::
+   Touchlink commissioning does not work when the ``CONFIG_LIGHT_SWITCH_ZIGBEE_SLEEPY`` Kconfig option is enabled.
+   The sample disables Sleepy End Device behavior automatically when ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is selected.
+   See :ref:`matter_zigbee_known_issue_touchlink_sleepy`.
 
 .. note::
    Touchlink commissioning does not work reliably when the ``CONFIG_ZIGBEE_FOTA`` is enabled.
@@ -118,7 +127,8 @@ Low power operation
 
 The light switch is a sleepy device:
 
-* When Zigbee is active, the device can be configured as a Sleepy End Device using the ``CONFIG_LIGHT_SWITCH_ZIGBEE_SLEEPY`` Kconfig option (enabled by default).
+* When Zigbee is active, you can configure the device as a Sleepy End Device using the ``CONFIG_LIGHT_SWITCH_ZIGBEE_SLEEPY`` Kconfig option (enabled by default).
+  This option is not available when ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` is enabled, see :ref:`matter_zigbee_known_issue_touchlink_sleepy`.
 * When Matter is active, the device is a Thread Minimal Thread Device with Intermittently Connected Device support.
 
 For low power operation, use the :file:`matter_fota_release.conf` overlay described in :ref:`matter_zigbee_light_switch_build_variants`.
@@ -127,7 +137,7 @@ For additional power savings, disable all DK LED indications with ``CONFIG_MATTE
 
 .. note::
    While Zigbee is active, the Matter stack advertises for commissioning over Bluetooth LE as described in the `Overview`_ section.
-   During Zigbee operation the power consumption is increased until the advertising duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` elapses.
+   During Zigbee operation, the power consumption is increased until the advertising duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` elapses.
 
 .. _matter_zigbee_light_switch_user_interface:
 
