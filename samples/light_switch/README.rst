@@ -78,7 +78,7 @@ A long press on the same button switches protocol instead; see :ref:`matter_zigb
 .. note::
    Touchlink commissioning does not work reliably when the ``CONFIG_ZIGBEE_FOTA`` is enabled.
    To test Touchlink, disable Zigbee FOTA.
-   See :ref:`known_isses`_ and the `Zigbee R32 add-on known issues`_ for more details.
+   See :ref:`known_isses`_ and the `Zigbee R23 add-on known issues`_ for more details.
 
 .. _matter_zigbee_limitations:
 

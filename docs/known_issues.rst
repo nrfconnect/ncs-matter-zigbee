@@ -19,7 +19,7 @@ Items can have one or both of the following entries:
   Some known issues have a workaround.
   Sometimes, they are discovered later and added over time.
 
-The |addon| inherits the known issues related to the Zigbee and Matter stacks from the `Zigbee R32 add-on known issues`_ and the `nRF Connect SDK known issues`_.
+The |addon| inherits the known issues related to the Zigbee and Matter stacks from the `Zigbee R23 add-on known issues`_ and the `nRF Connect SDK known issues`_.
 
 List of known issues
 ********************
