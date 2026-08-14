@@ -109,17 +109,13 @@
   flex-direction: column;
   gap: 0.5rem;
   min-width: 0;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: visible;
 }
 
 .memory-viz-ram-column {
   align-self: start;
   min-width: 0;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: visible;
 }
 
 .memory-viz-bar-stack {
@@ -304,9 +300,7 @@
 
 .memory-viz-bar-wrap {
   min-width: 0;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: visible;
 }
 
 .memory-viz-bar-wrap-external {
@@ -316,13 +310,11 @@
 .memory-viz-bar {
   display: flex;
   width: 100%;
-  max-width: 100%;
   height: 1.75rem;
   border: 1px solid var(--bs-border-color, #ced4da);
   border-radius: 0.25rem;
   overflow: visible;
   background: var(--bs-body-bg, #fff);
-  box-sizing: border-box;
 }
 
 .memory-viz-segment {
@@ -332,7 +324,6 @@
   border-right: 1px solid rgba(255, 255, 255, 0.35);
   position: relative;
   cursor: default;
-  box-sizing: border-box;
 }
 
 .memory-viz-segment::after {
@@ -371,58 +362,7 @@
 .memory-viz-segment-boot,
 .memory-viz-segment-mbr,
 .memory-viz-segment-factory_data {
-  min-width: 0;
-}
-
-/* Charts live inside sphinx-tabs; use the stacked row layout there even on wide viewports. */
-.sphinx-tabs-panel .memory-viz-board {
-  max-width: 100%;
-}
-
-.sphinx-tabs-panel .memory-viz-chart-header,
-.sphinx-tabs-panel .memory-viz-chart-header.docutils.container,
-.sphinx-tabs-panel .memory-viz-sample-row,
-.sphinx-tabs-panel .memory-viz-sample-row.docutils.container {
-  grid-template-columns:
-    minmax(0, var(--memory-viz-nvm-fr, 4fr))
-    minmax(4.5rem, var(--memory-viz-ram-fr, 1fr));
-}
-
-.sphinx-tabs-panel .memory-viz-chart-header,
-.sphinx-tabs-panel .memory-viz-chart-header.docutils.container {
-  grid-template-areas: "nvm ram";
-}
-
-.sphinx-tabs-panel .memory-viz-chart-header .memory-viz-panel-title-sample {
-  display: none;
-}
-
-.sphinx-tabs-panel .memory-viz-chart-header .memory-viz-header-nvm {
-  grid-area: nvm;
-}
-
-.sphinx-tabs-panel .memory-viz-chart-header .memory-viz-header-ram {
-  grid-area: ram;
-}
-
-.sphinx-tabs-panel .memory-viz-sample-row,
-.sphinx-tabs-panel .memory-viz-sample-row.docutils.container {
-  grid-template-areas:
-    "sample sample"
-    "nvm ram";
-}
-
-.sphinx-tabs-panel .memory-viz-sample-row > .memory-viz-nvm-column {
-  grid-area: nvm;
-}
-
-.sphinx-tabs-panel .memory-viz-sample-row > .memory-viz-ram-column {
-  grid-area: ram;
-}
-
-.sphinx-tabs-panel .memory-viz-sample-row > .memory-viz-sample-label {
-  grid-area: sample;
-  margin-bottom: 0.1rem;
+  min-width: 3px;
 }
 
 .memory-viz-segment:last-child {

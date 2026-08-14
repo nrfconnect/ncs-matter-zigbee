@@ -183,7 +183,7 @@ def _render_segment(
     tooltip_class = _tooltip_align_class(segment_start_pct, width_pct)
     segment = (
         f'<div class="memory-viz-segment memory-viz-segment-{part["id"]}{tooltip_class}" '
-        f'style="flex:{width_pct:.4f} 1 0;min-width:0" '
+        f'style="flex:0 0 {width_pct:.4f}%" '
         f'data-tooltip="{html.escape(title, quote=True)}">'
         f"{inner}</div>"
     )
