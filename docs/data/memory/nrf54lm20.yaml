@@ -94,30 +94,30 @@ usage_by_test:
   sample.matter_zigbee.light_bulb:
     nvm:
       boot: 42
-      slot0: 1070
-    ram_used_kb: 228
+      slot0: 1005
+    ram_used_kb: 233
   sample.matter_zigbee.light_bulb.int_flash:
     nvm:
       boot: 42
-      slot0: 1070
-    ram_used_kb: 228
+      slot0: 998
+    ram_used_kb: 233
   sample.matter_zigbee.light_bulb.release:
     nvm:
       boot: 42
-      slot0: 979
-    ram_used_kb: 228
+      slot0: 916
+    ram_used_kb: 233
   sample.matter_zigbee.light_switch:
     nvm:
       boot: 42
-      slot0: 940
-    ram_used_kb: 201
+      slot0: 878
+    ram_used_kb: 216
   sample.matter_zigbee.light_switch.int_flash:
     nvm:
       boot: 42
-      slot0: 940
-    ram_used_kb: 201
+      slot0: 879
+    ram_used_kb: 216
   sample.matter_zigbee.light_switch.release:
     nvm:
       boot: 42
-      slot0: 849
-    ram_used_kb: 201
+      slot0: 794
+    ram_used_kb: 216
