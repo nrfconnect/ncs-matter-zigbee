@@ -7,7 +7,9 @@ Known issues
    :local:
    :depth: 2
 
-Known issues listed on this page are valid for the current state of development.
+Known issues listed on this page *and* tagged with the :ref:`latest release version <release_notes>` are valid for the current state of development.
+Use the drop-down filter to see known issues for previous releases and check if they are still valid.
+
 Items can have one or both of the following entries:
 
 * **Affected platforms:**
@@ -23,6 +25,16 @@ The |addon| inherits the known issues related to the Zigbee and Matter stacks fr
 
 List of known issues
 ********************
+
+.. version-filter::
+  :default: v1-0-0
+  :container: dl/dt
+  :tags: [("wontfix", "Won't fix")]
+
+.. page-filter::
+  :name: issues
+
+  wontfix    Won't fix
 
 .. rst-class:: v1-0-0
 
