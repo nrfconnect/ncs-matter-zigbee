@@ -30,18 +30,28 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
       1. In the `Installing the nRF Connect SDK`_ section, click :guilabel:`Create a new application`.
       #. Select :guilabel:`Browse nRF Connect SDK Add-on Index`, then choose :guilabel:`NCS Matter and Zigbee`.
-      #. Select v\ |addon_version| of the |addon|.
+      #. Select |release| of the |addon|.
          This step also installs the |NCS| v\ |ncs_version|.
 
    .. group-tab:: Command line
 
+      In the following commands, replace *version* with the tag of the |addon| release you want to use, or with ``main`` to use the latest development state.
+
       **Initialize a new workspace:**
 
-      1. Run the following command to initialize west with the |addon|, which also initializes the |NCS| v\ |ncs_version|:
+      1. Run the following command to initialize west with the |addon|, which also initializes the compatible version of the |NCS|:
 
-         .. code-block:: console
+         .. parsed-literal::
+            :class: highlight
 
-            west init -m https://github.com/nrfconnect/ncs-matter-zigbee
+            west init -m https\://github.com/nrfconnect/ncs-matter-zigbee --mr *version*
+
+         For example:
+
+         .. parsed-literal::
+            :class: highlight
+
+            west init -m https\://github.com/nrfconnect/ncs-matter-zigbee --mr |release|
 
       #. Update the |NCS| modules:
 
@@ -61,9 +71,17 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
          #. Clone the add-on repository:
 
-            .. code-block:: console
+            .. parsed-literal::
+               :class: highlight
 
-               git clone https://github.com/nrfconnect/ncs-matter-zigbee
+               git clone --branch *version* https\://github.com/nrfconnect/ncs-matter-zigbee
+
+            For example:
+
+            .. parsed-literal::
+               :class: highlight
+
+               git clone --branch |release| https\://github.com/nrfconnect/ncs-matter-zigbee
 
          #. Set the manifest path to the add-on directory:
 
