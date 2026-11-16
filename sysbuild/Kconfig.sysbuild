@@ -1,0 +1,10 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+# Workaround for ncs-matter defining MATTER_ADD_ON with "default y".
+config MATTER_ADD_ON
+	bool
+	default n
