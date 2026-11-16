@@ -5,6 +5,7 @@ name: ncs-matter-zigbee
 build:
   kconfig: Kconfig
   cmake: .
+  sysbuild-kconfig: sysbuild/Kconfig.sysbuild
   sysbuild-cmake: sysbuild
   settings:
     dts_root: .

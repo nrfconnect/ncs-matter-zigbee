@@ -112,7 +112,7 @@ static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(APP_UI_PWM_LIGHT_NODE)
 #error Define ZB_ROUTER_ROLE to compile router source code.
 #endif
 
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 /* Main application customizable context.
  * Stores all settings and static values.

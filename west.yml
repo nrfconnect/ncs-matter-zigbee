@@ -14,10 +14,21 @@ manifest:
       remote: ncs
       repo-path: sdk-nrf
       revision: v3.4.0
-      import: true
-
+      import:
+        name-blocklist:
+          - matter
+       
     - name: ncs-zigbee
       remote: ncs
       repo-path: ncs-zigbee
       revision: v1.4.0
       path: ncs-zigbee
+
+    - name: ncs-matter
+      remote: ncs
+      repo-path: ncs-matter
+      revision: v1.0.1
+      path: ncs-matter
+      import:
+        name-allowlist:
+          - matter
