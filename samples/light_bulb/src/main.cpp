@@ -15,12 +15,19 @@
 #include <matter_zigbee_coexistence.h>
 #include <matter_zigbee_ui.h>
 
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
 namespace
 {
 
 void matter_start_cb(void)
 {
-	AppTask::Instance().StartApp();
+	CHIP_ERROR err = AppTask::Instance().StartApp();
+	if (err != CHIP_NO_ERROR) {
+		LOG_ERR("Matter application failed to start: %" CHIP_ERROR_FORMAT, err.Format());
+	}
 }
 
 bool app_ui_button_handler(uint32_t button_state, uint32_t has_changed, active_protocol_t active_protocol)

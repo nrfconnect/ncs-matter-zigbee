@@ -4,7 +4,7 @@ Over-the-air firmware upgrade
 You can update your device's firmware over the air using three methods.
 
 * Matter OTA – Updates your device through MCUboot, satisfying the Matter specification's requirement to support at least one over-the-air software update method.
-  Enable it with the ``SB_CONFIG_MATTER_OTA`` sysbuild Kconfig option, which sets ``CONFIG_CHIP_OTA_REQUESTOR`` on the application image.
+  Enable it with the ``SB_CONFIG_MATTER_ADD_ON_OTA`` sysbuild Kconfig option, which sets ``CONFIG_CHIP_OTA_REQUESTOR`` on the application image.
   Both options are enabled by default when building with sysbuild.
 
 * Zigbee Firmware-Over-the-Air (FOTA) - Updates the device over the Zigbee network using the Zigbee Cluster Library (ZCL) OTA upgrade cluster. 

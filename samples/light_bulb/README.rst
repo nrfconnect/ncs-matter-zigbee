@@ -214,7 +214,7 @@ Dependencies
 
 This sample uses the following |NCS| libraries and components:
 
-* The Matter stack (``CONFIG_CHIP``) shipped with the |NCS|, including the On/Off, Level Control and Identify clusters and the Matter factory data module.
+* The Matter stack (``CONFIG_CHIP``) provided by the `Matter add-on`_, including the On/Off, Level Control and Identify clusters and the Matter factory data module.
 * OpenThread (used by Matter on 802.15.4) and the `SoftDevice Controller`_ (used for CHIPoBLE commissioning).
 * The :file:`matter_zigbee_coexistence` and :file:`matter_zigbee_protocol_state` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
 * The :file:`nrf_802154_callbacks_dispatcher` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).

@@ -11,7 +11,7 @@
  * @brief Matter Identify cluster using @ref MATTER_ZIGBEE_UI_LED_IDENTIFY.
  */
 
-#include <app/DefaultTimerDelegate.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
