@@ -10,15 +10,15 @@ Release notes
 All the notable changes to the |addon| for the |NCS| are listed here.
 
 The |addon| v\ |addon_version| is compatible with |NCS| v\ |ncs_version| and uses the `Zigbee R23 add-on`_ |zigbee_addon_version| version.
-For a full list of |addon| releases, related |NCS|, Matter and `Zigbee R23 add-on`_ versions, view the following table:
+For a full list of |addon| releases, related |NCS|, Matter add-on, Matter, `Zigbee R23 add-on`_, and Zigbee versions, view the following table:
 
-+-------------------+------------------+--------------------------+----------------+------------------------------+
-| |addon| version   | |NCS| version    | `Matter add-on`_ version | Matter version |`Zigbee R23 add-on`_ version  |
-+===================+==================+==========================+================+==============================+
-| 2.0.0             | 3.4.0            | 1.0.1                    | 1.6.0          | 1.4.0                        |
-+-------------------+------------------+--------------------------+----------------+------------------------------+
-| 1.0.0             | 3.4.0            | --                       | 1.5.0          | 1.4.0                        |
-+-------------------+------------------+--------------------------+----------------+------------------------------+
++-------------------+------------------+--------------------------+----------------+------------------------------+----------------+
+| |addon| version   | |NCS| version    | `Matter add-on`_ version | Matter version | `Zigbee R23 add-on`_ version | Zigbee version |
++===================+==================+==========================+================+==============================+================+
+| 2.0.0             | 3.4.0            | 1.0.1                    | 1.6.0          | 2.0.0                        | 4.0            |
++-------------------+------------------+--------------------------+----------------+------------------------------+----------------+
+| 1.0.0             | 3.4.0            | --                       | 1.5.0          | 1.4.0                        | 3.0            |
++-------------------+------------------+--------------------------+----------------+------------------------------+----------------+
 
 For detailed list on new features for a specific |addon| release, refer to the following:
 

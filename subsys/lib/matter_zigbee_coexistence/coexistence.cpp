@@ -178,6 +178,33 @@ K_THREAD_DEFINE(zigbee_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_ZIGBEE_THREAD
 K_THREAD_DEFINE(matter_thread_id, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_STACK_SIZE, matter_thread_fn, NULL,
 		NULL, NULL, CONFIG_MATTER_ZIGBEE_COEXISTENCE_MATTER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
+/**
+ * Park the ZBOSS thread at a safe point before switching to Matter/Thread.
+ *
+ * Scheduled on the ZBOSS thread via zigbee_schedule_callback() from switch_to_thread_radio().
+ * k_thread_abort() does not release kernel synchronization objects held by the aborted thread,
+ * so aborting ZBOSS asynchronously could leave flash or settings locks permanently taken.
+ *
+ * Executing inside a ZBOSS scheduler callback guarantees no flash or settings locks are held.
+ * The callback hands off teardown to the system workqueue via @c switch_to_thread_work and
+ * suspends the ZBOSS thread indefinitely with k_sleep(K_FOREVER) so no further Zigbee work
+ * runs before switch_to_thread_radio_work_handler() aborts and deinitializes the stack.
+ * If work submission fails, @c g_switch_to_thread_pending is cleared and ZBOSS resumes normally.
+ *
+ * @param param Unused ZBOSS callback parameter.
+ */
+void zboss_park_cb(zb_cb_param_t param)
+{
+	ARG_UNUSED(param);
+
+	if (k_work_submit(&switch_to_thread_work) < 0) {
+		atomic_set(&g_switch_to_thread_pending, 0);
+		return;
+	}
+
+	k_sleep(K_FOREVER);
+}
+
 void switch_to_thread_radio_work_handler(struct k_work *work)
 {
 	ARG_UNUSED(work);
@@ -216,7 +243,7 @@ void switch_to_thread_radio(void)
 		return;
 	}
 
-	if (k_work_submit(&switch_to_thread_work) != 0) {
+	if (zigbee_schedule_callback(zboss_park_cb, 0) != RET_OK) {
 		atomic_set(&g_switch_to_thread_pending, 0);
 	}
 }
@@ -233,24 +260,6 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 	ARG_UNUSED(arg);
 
 	switch (event->Type) {
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
-	case chip::DeviceLayer::DeviceEventType::kCHIPoBLEAdvertisingChange:
-		if (event->CHIPoBLEAdvertisingChange.Result == chip::DeviceLayer::kActivity_Started) {
-			matter_board_init_signal();
-		}
-		break;
-	case chip::DeviceLayer::DeviceEventType::kServerReady:
-		/*
-		 * Fallback when operational DNS-SD comes up. After switching back
-		 * to Zigbee, DNS-SD often stays disabled while Thread is deferred,
-		 * so app_task_matter also signals once StartServer() returns.
-		 */
-		if (protocol_state_get() == PROTOCOL_ZIGBEE &&
-		    chip::Server::GetInstance().GetFabricTable().FabricCount() > 0) {
-			matter_board_init_signal();
-		}
-		break;
-#endif /* CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE */
 	case chip::DeviceLayer::DeviceEventType::kSecureSessionEstablished:
 		if (protocol_state_get() == PROTOCOL_ZIGBEE
 #if defined(CONFIG_OPENTHREAD)
@@ -320,18 +329,7 @@ extern "C" void matter_zigbee_coexistence_on_server_started(void)
 	}
 #endif
 
-#ifdef CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
-	/* The Zigbee worker always waits on matter_init_done_sem, including in
-	 * the PROTOCOL_MATTER boot path (to synchronise with start_thread_network_if_commissioned).
-	 * In Zigbee mode with no fabrics the kCHIPoBLEAdvertisingChange event
-	 * unblocks the worker; in all other cases (Matter mode, or Zigbee mode
-	 * with existing fabrics that suppress advertising) signal explicitly. */
-	if (protocol_state_get() == PROTOCOL_MATTER || chip::Server::GetInstance().GetFabricTable().FabricCount() > 0) {
-		matter_board_init_signal();
-	}
-#else
 	matter_board_init_signal();
-#endif
 }
 
 extern "C" void matter_zigbee_coexistence_pre_server_init(void)

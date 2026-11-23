@@ -24,25 +24,6 @@ menuconfig MATTER_ZIGBEE_COEXISTENCE
 
 if MATTER_ZIGBEE_COEXISTENCE
 
-config MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
-	bool "Allow CHIPoBLE commissioning while Zigbee is active"
-	default y
-	depends on CHIP_ENABLE_PAIRING_AUTOSTART
-	help
-	  When enabled, Matter may start BLE commissioning advertising while
-	  the Zigbee stack owns the 802.15.4 radio. The Zigbee worker waits
-	  for the first CHIPoBLE advertising-started event before chaining
-	  sample button handlers and starting Zigbee.
-
-	  Requires CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART in the application.
-
-	  When disabled, the sample must call
-	  matter_zigbee_coexistence_signal_matter_board_init() after Matter
-	  server init completes.
-	  The Zigbee worker then proceeds without waiting for Thread
-	  or DNS-SD. Set CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=n if Matter
-	  commissioning over BLE is not needed until after a protocol switch.
-
 config MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH
 	bool "Enable user protocol switch on button long press"
 	default y
