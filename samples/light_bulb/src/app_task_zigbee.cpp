@@ -39,10 +39,10 @@
 #include <ram_pwrdn.h>
 
 extern "C" {
-#include "zb_dimmable_light.h"
 #include <dk_buttons_and_leds.h>
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
+#include <zb_ha_dimmable_light.h>
 #include <zboss_api_addons.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
@@ -153,10 +153,10 @@ ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(on_off_attr_list, &dev_ctx.on_off_attr.on_off)
 ZB_ZCL_DECLARE_LEVEL_CONTROL_ATTRIB_LIST(level_control_attr_list, &dev_ctx.level_control_attr.current_level,
 					 &dev_ctx.level_control_attr.remaining_time);
 
-ZB_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(dimmable_light_clusters, basic_attr_list, identify_attr_list, groups_attr_list,
-				       scenes_attr_list, on_off_attr_list, level_control_attr_list);
+ZB_HA_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(dimmable_light_clusters, basic_attr_list, identify_attr_list, groups_attr_list,
+					  scenes_attr_list, on_off_attr_list, level_control_attr_list);
 
-ZB_DECLARE_DIMMABLE_LIGHT_EP(dimmable_light_ep, DIMMABLE_LIGHT_ENDPOINT, dimmable_light_clusters);
+ZB_HA_DECLARE_DIMMABLE_LIGHT_EP(dimmable_light_ep, DIMMABLE_LIGHT_ENDPOINT, dimmable_light_clusters);
 
 #ifndef CONFIG_ZIGBEE_FOTA
 ZBOSS_DECLARE_DEVICE_CTX_1_EP(dimmable_light_ctx, dimmable_light_ep);
@@ -172,11 +172,11 @@ ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmable_light_ctx, zigbee_fota_client_ep, dimmabl
 
 /**@brief Starts identifying the device.
  *
- * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
+ * @param  param  Unused parameter, required by ZBOSS scheduler API.
  */
-static void start_identifying(zb_bufid_t bufid)
+static void start_identifying(zb_cb_param_t param)
 {
-	ZVUNUSED(bufid);
+	ZVUNUSED(param);
 
 	if (ZB_JOINED()) {
 		/* Check if endpoint is in identifying mode,
@@ -300,26 +300,26 @@ static void on_off_set_value(zb_bool_t on)
 
 /**@brief Function to toggle the identify LED.
  *
- * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
+ * @param  param  Parameter passed on to the next scheduled toggle.
  */
-static void toggle_identify_led(zb_bufid_t bufid)
+static void toggle_identify_led(zb_cb_param_t param)
 {
 	static int blink_status;
 
 	matter_zigbee_ui_led_set(MATTER_ZIGBEE_UI_LED_IDENTIFY, ((++blink_status) % 2) != 0);
-	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
+	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, param, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
 /**@brief Function to handle identify notification events on the first endpoint.
  *
- * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
+ * @param  param  Non-zero when identification starts, zero when it stops.
  */
-static void identify_cb(zb_bufid_t bufid)
+static void identify_cb(zb_cb_param_t param)
 {
 	zb_ret_t zb_err_code;
 
-	if (bufid) {
-		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, bufid);
+	if (param) {
+		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, param);
 	} else {
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
@@ -417,11 +417,12 @@ static void ota_evt_handler(const struct zigbee_fota_evt *evt)
 
 /**@brief Callback function for handling ZCL commands.
  *
- * @param[in]   bufid   Reference to Zigbee stack buffer
+ * @param[in]   param   Reference to Zigbee stack buffer
  *                      used to pass received data.
  */
-static void zcl_device_cb(zb_bufid_t bufid)
+static void zcl_device_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = (zb_bufid_t)param;
 	zb_uint8_t cluster_id;
 	zb_uint8_t attr_id;
 	zb_zcl_device_callback_param_t *device_cb_param = ZB_BUF_GET_PARAM(bufid, zb_zcl_device_callback_param_t);
@@ -487,13 +488,15 @@ static void zcl_device_cb(zb_bufid_t bufid)
 
 /**@brief Zigbee stack event handler.
  *
- * @param[in]   bufid   Reference to the Zigbee stack buffer
+ * @param[in]   param   Reference to the Zigbee stack buffer
  *                      used to pass signal.
  */
-void zboss_signal_handler(zb_bufid_t bufid)
+void zboss_signal_handler(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = (zb_bufid_t)param;
+
 #ifdef CONFIG_ZIGBEE_FOTA
-	zigbee_fota_signal_handler(bufid);
+	zigbee_fota_signal_handler(param);
 #endif
 
 	/* Update network status LED. */

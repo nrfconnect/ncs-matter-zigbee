@@ -80,11 +80,26 @@ void matter_zigbee_ui_zigbee_led_update(uint8_t bufid)
 	}
 
 	switch (signal) {
+	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
+	/* fall-through */
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
-		s_zigbee_network_joined = (status == RET_OK);
+		/* RET_OK on first start can be BDB init before join; require ZB_JOINED(). */
+		if ((status == RET_OK) && ZB_JOINED()) {
+			s_zigbee_network_joined = true;
+		} else if (status != RET_OK) {
+			s_zigbee_network_joined = false;
+		}
 		break;
+
+#if defined(CONFIG_ZB_BDB_TOUCHLINK) && defined(ZB_BDB_SIGNAL_TOUCHLINK_NWK)
+	case ZB_BDB_SIGNAL_TOUCHLINK_NWK:
+		if (status == RET_OK) {
+			s_zigbee_network_joined = true;
+		}
+		break;
+#endif
 
 	case ZB_ZDO_SIGNAL_LEAVE:
 		s_zigbee_network_joined = false;

@@ -44,10 +44,8 @@ struct matter_zigbee_coexistence_callbacks {
 	int (*zigbee_start)(void);
 
 	/** Hook run on the Zigbee worker thread once Matter is ready for the
-	 *  Zigbee phase (CHIPoBLE advertising started when
-	 *  @kconfig{CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE},
-	 *  otherwise after @ref matter_zigbee_coexistence_on_server_started
-	 *  unblocks the Zigbee worker).
+	 *  Zigbee phase, after @ref matter_zigbee_coexistence_on_server_started
+	 *  unblocks the Zigbee worker.
 	 *  Typically @ref matter_zigbee_ui_register to initialise DK buttons and
 	 *  chain the common UI handler. May be NULL.
 	 */
@@ -73,15 +71,9 @@ int matter_zigbee_coexistence_run(const struct matter_zigbee_coexistence_callbac
 /** @brief Notify the coexistence runtime that @c Nrf::Matter::StartServer() has returned.
  *
  * Call unconditionally from the Matter worker thread's @c AppTask::Init()
- * immediately after @c Nrf::Matter::StartServer() succeeds.  Internally
- * handles all coexistence signaling variants:
- *
- * - When @kconfig{CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE} is
- *   disabled: unblocks the Zigbee worker unconditionally.
- * - When it is enabled: unblocks the Zigbee worker only on a Zigbee boot
- *   that follows a prior Matter commissioning (i.e. the device already has
- *   a fabric), because BLE advertising will not restart and the normal
- *   @c kCHIPoBLEAdvertisingChange signal will never fire.
+ * immediately after @c Nrf::Matter::StartServer() succeeds.  In Zigbee
+ * mode, restores the 802.15.4 dispatcher to Zigbee.  In all modes,
+ * unblocks the Zigbee worker.
  */
 void matter_zigbee_coexistence_on_server_started(void);
 

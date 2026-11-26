@@ -133,6 +133,9 @@ Building and running
 Testing
 =======
 
+Build the `Zigbee Network Coordinator`_ sample with the ``zigbee_demo_commissioning`` snippet, so that it accepts devices without an install code (see `Trust Center security policy`_).
+To join with an install code instead, see `Commissioning devices with install codes`_.
+
 After programming the sample to your development kits, complete the following steps to test basic Zigbee operation:
 
 1. Turn on the development kit that runs the Network coordinator sample.

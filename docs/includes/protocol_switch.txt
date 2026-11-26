@@ -38,9 +38,3 @@ The following example shows the required structure:
    // ...
    ReturnErrorOnFailure(Nrf::Matter::StartServer());
    matter_zigbee_coexistence_on_server_started();
-
-Other Kconfig options in the coexistence layer:
-
-* :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE` (default enabled) — Matter may advertise for commissioning over Bluetooth LE while Zigbee owns the 802.15.4 radio.
-  When disabled, the Zigbee worker is unblocked directly from ``matter_zigbee_coexistence_on_server_started()`` without waiting for CHIPoBLE advertising.
-* :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BUTTON_SWITCH` — Enable or disable the button-triggered protocol switch.

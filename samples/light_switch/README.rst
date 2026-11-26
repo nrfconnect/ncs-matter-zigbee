@@ -185,6 +185,9 @@ Building and running
 Testing
 =======
 
+Build the `Zigbee Network Coordinator`_ sample with the ``zigbee_demo_commissioning`` snippet, so that it accepts devices without an install code (see `Trust Center security policy`_).
+To join with an install code instead, see `Commissioning devices with install codes`_.
+
 After programming the sample to your development kits, complete the following steps to test basic Zigbee operation:
 
 1. Turn on the development kit that runs the Network coordinator sample.
@@ -231,7 +234,7 @@ Complete the following steps:
      #. Power the light switch and press the Touchlink button (see :ref:`matter_zigbee_light_switch_touchlink`).
         The two devices form a distributed-security Zigbee network and the light switch finds the bulb to control, without a Zigbee Coordinator on the network.
 
-   While the device is still a Zigbee End Device, it also advertises for Matter commissioning over Bluetooth LE if :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_BT_ADV_WHILE_ZIGBEE` is enabled.
+   While the device is still a Zigbee End Device, it also advertises for Matter commissioning over Bluetooth LE if the ``CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART`` Kconfig option is enabled.
 #. Optionally, long-press Button 1 for :option:`CONFIG_MATTER_ZIGBEE_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS` to switch to Matter.
    The Zigbee stack is stopped and the radio is handed to OpenThread.
    Skip the next step if you use this path and Matter was already commissioned in a previous session.
